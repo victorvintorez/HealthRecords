@@ -1,19 +1,27 @@
+using HealthRecords.Server.Database;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using NReco.Logging.File;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add Logging
-builder.Services.AddLogging(logging => logging.AddFile(
-    Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "HealthRecords", "Logs",
-        "HealthRecords_{0:yyyy-MM-dd}.log"),
-    c => {
-        c.FormatLogFileName = filename => string.Format(filename, DateTime.Now);
-        c.MaxRollingFiles = 5;
-    }));
+if (builder.Environment.IsDevelopment()) {
+    builder.Services.AddLogging(logging => logging.AddFile(
+        Path.Join("Logs", "HealthRecords_{0:yyyy-MM-dd}.log"),
+        c => {
+            c.FormatLogFileName = filename => string.Format(filename, DateTime.Now);
+            c.MaxRollingFiles = 5;
+        }));
+}
 
 // Setup Database (Required for Authentication)
+builder.Services.AddDbContext<HealthRecordsDbContext>(options => 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
 
 // Setup Authentication
+builder.Services.AddAuthorization();
+builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddEntityFrameworkStores<HealthRecordsDbContext>();
 
 // Setup Controllers
 builder.Services.AddControllers();
@@ -24,16 +32,14 @@ builder.Services.AddOpenApi();
 WebApplication app = builder.Build();
 
 // Run Database Migrations
-/*
 await using (AsyncServiceScope scope = app.Services.CreateAsyncScope()) {
-    var db = scope.ServiceProvider.GetService<>();
+    var db = scope.ServiceProvider.GetService<HealthRecordsDbContext>();
     if (db != null) {
         await db.Database.MigrateAsync();
     } else {
         throw new Exception("Could not perform database migrations.");
     }
 }
-*/
 
 // SPA Support
 app.UseDefaultFiles();
@@ -47,6 +53,7 @@ if (app.Environment.IsDevelopment()) {
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+app.MapIdentityApi<IdentityUser>();
 
 app.MapControllers();
 

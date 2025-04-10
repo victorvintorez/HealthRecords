@@ -1,0 +1,21 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  healthrecords:
+    build:
+      context: "/home/vvintorez/Documents/University/HealthRecords"
+      dockerfile: "HealthRecords.Server/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net9.0/HealthRecords.Server.dll"
+    environment:
+      ASPNETCORE_STATICWEBASSETS: "/app/bin/Debug/net9.0/HealthRecords.Server.staticwebassets.runtime.CT.json"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "healthrecords.server:dev"
+    ports: []
+    volumes:
+    - "/home/vvintorez/Documents/University/HealthRecords/HealthRecords.Server:/app:rw"
+    - "/home/vvintorez/Documents/University/HealthRecords:/src:rw"
+    - "/home/vvintorez/.nuget/packages:/root/.nuget/packages"
+    working_dir: "/app"

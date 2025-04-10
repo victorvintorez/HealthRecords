@@ -1,10 +1,17 @@
-bin/
-obj/
+HealthRecords.Server/bin/
+HealthRecords.Server/obj/
+HealthRecords.Server/Logs/
+HealthRecords.Server/appsettings.*
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
 
+HealthRecords.Web/bin/
+HealthRecords.Web/obj/
+HealthRecords.Web/obj/Debug/
 node_modules/
 dist/
 dist-ssr/
 *.local
+
+.env
