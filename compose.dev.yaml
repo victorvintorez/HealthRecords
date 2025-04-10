@@ -20,25 +20,6 @@ services:
       - azurite-data:/data
     command: "azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0 --location /data"
 
-  healthrecords:
-    build:
-      context: .
-      dockerfile: HealthRecords.Server/Dockerfile
-    environment:
-      ASPNETCORE_ENVIRONMENT: "Development"
-      ConnectionStrings__SqlConnection: "Server=sqlserver;Database=HealthRecordsDb;User Id=sa;Password=${SQL_SERVER_PASSWORD};TrustServerCertificate=True;"
-      ConnectionStrings__BlobConnection: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;"
-    ports:
-      - "8080:80"
-      - "8081:443"
-    depends_on:
-      sqlserver:
-        condition: service_started
-      azurite:
-        condition: service_started
-    volumes:
-      - ${APPDATA:-~/.config}/ASP.NET/Https:/root/.aspnet/https:ro
-
 volumes:
   sqlserver-data:
   azurite-data:
