@@ -1,6 +1,9 @@
 using HealthRecords.Server.Database;
+using HealthRecords.Server.Models.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using NReco.Logging.File;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -19,9 +22,17 @@ if (builder.Environment.IsDevelopment()) {
 builder.Services.AddDbContext<HealthRecordsDbContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
 
+// Setup Azure Blob Storage
+builder.Services.AddAzureClients(clientBuilder => {
+    clientBuilder.AddBlobServiceClient(builder.Configuration.GetConnectionString("BlobConnection"));
+});
+
 // Setup Authentication
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddIdentityCookies();
 builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddEntityFrameworkStores<HealthRecordsDbContext>();
+builder.Services.AddIdentityCore<HealthRecordsUser>(options => {
+    options.SignIn.RequireConfirmedAccount = false;
+}).AddEntityFrameworkStores<HealthRecordsDbContext>();
 
 // Setup Controllers
 builder.Services.AddControllers();
@@ -52,8 +63,8 @@ if (app.Environment.IsDevelopment()) {
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
-app.MapIdentityApi<IdentityUser>();
 
 app.MapControllers();
 
