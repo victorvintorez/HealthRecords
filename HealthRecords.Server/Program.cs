@@ -1,6 +1,4 @@
 using HealthRecords.Server.Database;
-using HealthRecords.Server.Models.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
@@ -28,11 +26,8 @@ builder.Services.AddAzureClients(clientBuilder => {
 });
 
 // Setup Authentication
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddIdentityCookies();
 builder.Services.AddAuthorization();
-builder.Services.AddIdentityCore<HealthRecordsUser>(options => {
-    options.SignIn.RequireConfirmedAccount = false;
-}).AddEntityFrameworkStores<HealthRecordsDbContext>();
+builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddEntityFrameworkStores<HealthRecordsDbContext>();
 
 // Setup Controllers
 builder.Services.AddControllers();
@@ -66,6 +61,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapIdentityApi<IdentityUser>();
 app.MapControllers();
 
 app.Run();

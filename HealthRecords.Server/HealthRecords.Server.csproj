@@ -39,6 +39,7 @@
 	
 	<ItemGroup>
 		<Folder Include="Migrations\" />
+		<Folder Include="Models\FromBody\" />
 	</ItemGroup>
 	
 	<Target Name="CreateWwwrootFolder" AfterTargets="AfterBuild">
