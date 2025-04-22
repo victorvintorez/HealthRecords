@@ -16,7 +16,7 @@ public class Procedure {
     
     // Relationships
     public required int HealthRecordId { get; set; }
-    public required HealthRecord HealthRecord { get; set; }
-    public required Staff AttendingDoctor { get; set; }
-    public ICollection<FileBlob>? Files { get; set; }
+    public virtual required HealthRecord HealthRecord { get; set; }
+    public virtual required Staff AttendingDoctor { get; set; }
+    public virtual ICollection<FileBlob> Files { get; } = new List<FileBlob>();
 }

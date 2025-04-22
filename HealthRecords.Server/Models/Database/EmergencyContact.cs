@@ -15,5 +15,5 @@ public class EmergencyContact {
      
     // Relationships
     public required int PatientId { get; set; }
-    public required Patient Patient { get; set; }
+    public virtual required Patient Patient { get; set; }
 }

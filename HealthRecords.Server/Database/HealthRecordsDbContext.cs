@@ -17,11 +17,11 @@ public class HealthRecordsDbContext(DbContextOptions<HealthRecordsDbContext> opt
     public DbSet<Prescription> Prescriptions { get; set; }
     public DbSet<Procedure> Procedures { get; set; }
     public DbSet<Staff> Staff { get; set; }
-    
+
     // Setup Relationships & Conversions
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         base.OnModelCreating(modelBuilder);
-        
+
         // CONVERSIONS
         // Staff.Role -> String
         modelBuilder.Entity<Staff>().Property(e => e.Role).HasConversion<string>();
@@ -43,31 +43,74 @@ public class HealthRecordsDbContext(DbContextOptions<HealthRecordsDbContext> opt
         modelBuilder.Entity<HealthRecord>().Property(e => e.Reason).HasConversion<string>();
         // Procedure.Category -> String
         modelBuilder.Entity<Procedure>().Property(e => e.Category).HasConversion<string>();
-        
+
         //// RELATIONSHIPS
         // Staff.Hospital -> Hospital
-        modelBuilder.Entity<Staff>().HasOne(e => e.Hospital).WithMany(e => e.Staff).HasForeignKey(e => e.HospitalId).HasPrincipalKey(e => e.Id);
+        modelBuilder.Entity<Staff>()
+            .HasOne(e => e.Hospital)
+            .WithMany(e => e.Staff)
+            .HasForeignKey(e => e.HospitalId)
+            .HasPrincipalKey(e => e.Id)
+            .OnDelete(DeleteBehavior.NoAction);
         // Staff.ProfileImage -> FileBlob
-        modelBuilder.Entity<Staff>().HasOne(e => e.ProfileImage).WithMany(navigationName: null);
+        modelBuilder.Entity<Staff>()
+            .HasOne(e => e.ProfileImage)
+            .WithMany(navigationName: null)
+            .OnDelete(DeleteBehavior.Cascade);
         // Patient.Allergies -> Allergy
-        modelBuilder.Entity<Patient>().HasMany(e => e.Allergies).WithMany(navigationName: null);
+        modelBuilder.Entity<Patient>()
+            .HasMany(e => e.Allergies)
+            .WithMany(navigationName: null);
         // Patient.EmergencyContacts -> EmergencyContact
-        modelBuilder.Entity<Patient>().HasMany(e => e.EmergencyContacts).WithOne(e => e.Patient).HasForeignKey(e => e.PatientId).HasPrincipalKey(e => e.Id);
+        modelBuilder.Entity<Patient>()
+            .HasMany(e => e.EmergencyContacts)
+            .WithOne(e => e.Patient)
+            .HasForeignKey(e => e.PatientId)
+            .HasPrincipalKey(e => e.Id)
+            .OnDelete(DeleteBehavior.Cascade);
         // Patient.Prescriptions -> Prescription
-        modelBuilder.Entity<Patient>().HasMany(e => e.Prescriptions).WithOne(e => e.Patient).HasForeignKey(e => e.PatientId).HasPrincipalKey(e => e.Id);
+        modelBuilder.Entity<Patient>()
+            .HasMany(e => e.Prescriptions)
+            .WithOne(e => e.Patient)
+            .HasForeignKey(e => e.PatientId)
+            .HasPrincipalKey(e => e.Id)
+            .OnDelete(DeleteBehavior.Cascade);
         // Patient.GeneralPractitioner -> GeneralPractitioner
-        modelBuilder.Entity<Patient>().HasOne(e => e.GeneralPractitioner).WithMany(navigationName: null);
+        modelBuilder.Entity<Patient>()
+            .HasOne(e => e.GeneralPractitioner)
+            .WithMany(navigationName: null)
+            .OnDelete(DeleteBehavior.NoAction);
         // Patient.HealthRecords -> HealthRecord
-        modelBuilder.Entity<Patient>().HasMany(e => e.HealthRecords).WithOne(e => e.Patient).HasForeignKey(e => e.PatientId).HasPrincipalKey(e => e.Id);
+        modelBuilder.Entity<Patient>()
+            .HasMany(e => e.HealthRecords)
+            .WithOne(e => e.Patient)
+            .HasForeignKey(e => e.PatientId)
+            .HasPrincipalKey(e => e.Id)
+            .OnDelete(DeleteBehavior.Cascade);
         // HealthRecord.AttendingDoctor -> Staff
-        modelBuilder.Entity<HealthRecord>().HasOne(e => e.AttendingDoctor).WithMany(navigationName: null);
+        modelBuilder.Entity<HealthRecord>()
+            .HasOne(e => e.AttendingDoctor)
+            .WithMany(navigationName: null)
+            .OnDelete(DeleteBehavior.NoAction);
         // HealthRecord.Procedures -> Procedure
-        modelBuilder.Entity<HealthRecord>().HasMany(e => e.Procedures).WithOne(e => e.HealthRecord).HasForeignKey(e => e.HealthRecordId).HasPrincipalKey(e => e.Id);
+        modelBuilder.Entity<HealthRecord>()
+            .HasMany(e => e.Procedures)
+            .WithOne(e => e.HealthRecord)
+            .HasForeignKey(e => e.HealthRecordId)
+            .HasPrincipalKey(e => e.Id)
+            .OnDelete(DeleteBehavior.Cascade);
         // HealthRecord.Files -> FileBlob
-        modelBuilder.Entity<HealthRecord>().HasMany(e => e.Files).WithMany(navigationName: null);
+        modelBuilder.Entity<HealthRecord>()
+            .HasMany(e => e.Files)
+            .WithMany(navigationName: null);
         // Procedure.AttendingDoctor -> Staff
-        modelBuilder.Entity<Procedure>().HasOne(e => e.AttendingDoctor).WithMany(navigationName: null);
+        modelBuilder.Entity<Procedure>()
+            .HasOne(e => e.AttendingDoctor)
+            .WithMany(navigationName: null)
+            .OnDelete(DeleteBehavior.NoAction);
         // Procedure.Files -> FileBlob
-        modelBuilder.Entity<Procedure>().HasMany(e => e.Files).WithMany(navigationName: null);
+        modelBuilder.Entity<Procedure>()
+            .HasMany(e => e.Files)
+            .WithMany(navigationName: null);
     }
 }

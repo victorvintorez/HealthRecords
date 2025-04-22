@@ -20,9 +20,9 @@ public class Patient {
     public required BloodType BloodType { get; set; }
     
     // Relationships
-    public GeneralPractitioner GeneralPractitioner { get; set; }
-    public ICollection<Allergy> Allergies { get; set; }
-    public ICollection<EmergencyContact> EmergencyContacts { get; set; }
-    public ICollection<Prescription> Prescriptions { get; set; }
-    public ICollection<HealthRecord> HealthRecords { get; set; }
+    public virtual required GeneralPractitioner GeneralPractitioner { get; set; }
+    public virtual ICollection<Allergy> Allergies { get; } = new List<Allergy>();
+    public virtual ICollection<EmergencyContact> EmergencyContacts { get; } = new List<EmergencyContact>();
+    public virtual ICollection<Prescription> Prescriptions { get; } = new List<Prescription>();
+    public virtual ICollection<HealthRecord> HealthRecords { get; } = new List<HealthRecord>();
 }

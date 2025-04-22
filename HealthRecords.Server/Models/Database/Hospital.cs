@@ -14,5 +14,5 @@ public class Hospital {
     public required string PhoneNumber { get; set; }
     
     // Relationships
-    public ICollection<Staff> Staff { get; set; }
+    public virtual ICollection<Staff> Staff { get; } = new List<Staff>();
 }

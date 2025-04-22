@@ -17,6 +17,6 @@ public class Staff {
     
     // Relationships
     public required int HospitalId { get; set; } // The Hospital the user works at
-    public required Hospital Hospital { get; set; } // The Hospital the user works at
-    public required FileBlob ProfileImage { get; set; } // The user's profile image
+    public virtual required Hospital Hospital { get; set; } // The Hospital the user works at
+    public virtual required FileBlob ProfileImage { get; set; } // The user's profile image
 }
