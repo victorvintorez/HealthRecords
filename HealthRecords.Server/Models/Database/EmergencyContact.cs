@@ -1,9 +1,16 @@
+using System.ComponentModel.DataAnnotations;
+using HealthRecords.Server.Models.Enum;
+
 namespace HealthRecords.Server.Models.Database;
 
 public class EmergencyContact {
-    public required int Id { get; set; }
+    [Key]
+    [Required]
+    public int Id { get; set; }
+    [StringLength(255)]
     public required string FullName { get; set; }
-    public required string Relationship { get; set; }
+    public required Relationship Relationship { get; set; }
+    [StringLength(255)]
     public required string PhoneNumber { get; set; }
      
     // Relationships

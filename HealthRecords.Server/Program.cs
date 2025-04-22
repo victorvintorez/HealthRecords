@@ -26,7 +26,16 @@ builder.Services.AddAzureClients(clientBuilder => {
 });
 
 // Setup Authentication
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorizationBuilder()
+                           .AddPolicy("Administrator", policy =>
+        policy.RequireAssertion(c => {
+            if (c.User.Identity?.Name != null && c.User.Identity.Name ==
+                (builder.Configuration.GetSection("DefaultAdminAccount").Value ?? "admin@admin.net")) {
+                return true;
+            }
+
+            return c.User.IsInRole("Administrator");
+        }));
 builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddEntityFrameworkStores<HealthRecordsDbContext>();
 
 // Setup Controllers
