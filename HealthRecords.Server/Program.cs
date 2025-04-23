@@ -70,7 +70,12 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapIdentityApi<IdentityUser>();
+app.MapGroup("/api/v1/auth/").MapIdentityApi<IdentityUser>();
+app.MapPost("/api/v1/auth/logout", async (SignInManager<IdentityUser> signInManager) => {
+    await signInManager.SignOutAsync();
+    return Results.Ok();
+}).WithOpenApi().RequireAuthorization();
+
 app.MapControllers();
 
 app.Run();
