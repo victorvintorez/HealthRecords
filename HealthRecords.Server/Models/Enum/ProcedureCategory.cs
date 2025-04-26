@@ -5,5 +5,7 @@ public enum ProcedureCategory {
     BloodAnalysis,
     DiagnosticImaging,
     PhysicalExamination,
+    Biopsy,
+    Radiotherapy,
     Other
 }

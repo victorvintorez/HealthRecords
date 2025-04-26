@@ -15,6 +15,7 @@ public class Patient {
     public required string PhoneNumber { get; set; }
     public required DateTime DateOfBirth { get; set; }
     public required Gender Gender { get; set; }
+    public required Sex Sex { get; set; }
     public required float Weight { get; set; }
     public required float Height { get; set; }
     public required BloodType BloodType { get; set; }

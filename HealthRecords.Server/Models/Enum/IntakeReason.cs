@@ -5,5 +5,6 @@ public enum IntakeReason {
     FollowUp,
     Emergency,
     Transfer,
+    Referral,
     Other
 }
