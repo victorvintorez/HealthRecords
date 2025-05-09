@@ -155,7 +155,7 @@ public class StaffController(
         }
 
         // Upload the profile image to blob storage
-        var filename = $"{userId}_profile-img.{body.ProfileImage.FileName.Split(".")[-1]}";
+        var filename = $"{userId}_profile-img.{body.ProfileImage.FileName.Split(".").Last()}";
         BlobClient blobClient = blobServiceClient
             .CreateClient("HealthRecordsBlobStorage")
             .GetBlobContainerClient("staff-profile-images").GetBlobClient(filename);
@@ -334,7 +334,7 @@ public class StaffController(
             }
 
             // Upload the profile image to blob storage
-            var filename = $"{user.Id}_profile-img.{body.ProfileImage.FileName.Split(".")[-1]}";
+            var filename = $"{user.Id}_profile-img.{body.ProfileImage.FileName.Split(".").Last()}";
             BlobClient blobClient = blobServiceClient
                 .CreateClient("HealthRecordsBlobStorage")
                 .GetBlobContainerClient("staff-profile-images").GetBlobClient(filename);
@@ -432,7 +432,7 @@ public class StaffController(
             }
 
             // Upload the profile image to blob storage
-            var filename = $"{user.Id}_profile-img.{body.ProfileImage.FileName.Split(".")[-1]}";
+            var filename = $"{user.Id}_profile-img.{body.ProfileImage.FileName.Split(".").Last()}";
             BlobClient blobClient = blobServiceClient
                 .CreateClient("HealthRecordsBlobStorage")
                 .GetBlobContainerClient("staff-profile-images").GetBlobClient(filename);

@@ -1,6 +1,7 @@
 import { RegisterType } from "../types/auth";
+import {ApiOptions} from "../types/misc.ts";
 
-const register = async (input: RegisterType): Promise<boolean> => {
+const register = async (input: RegisterType): Promise<any> => {
 	const res = await fetch('api/v1/auth/register', {
 		method: 'POST',
 		headers: {
@@ -10,21 +11,19 @@ const register = async (input: RegisterType): Promise<boolean> => {
 	})
 	switch (res.status) {
 		case 200:
-			return true
+			return res.json()
 		default:
-			return false
+			throw Error(`Unexpected status: ${res.status}`);
 	}
 }
 
-export const authApi = {
+export const authApi: ApiOptions = {
 	mutation: {
 		register: {
-			key: 'register',
-			fn: register,
+			mutationKey: 'register',
+			mutationFn: register,
 			invalidates: ['auth.user']
 		}
 	},
-	query: {
-
-	}
+	query: {}
 }

@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 
 const appdata = platform() === 'win32' ? process.env.APPDATA : platform() === 'linux' ? `${process.env.HOME}/.local/share` : '';
 const key = `${appdata}/HealthRecords/cert.key`;
@@ -24,7 +25,7 @@ if (!existsSync(key) || !existsSync(cert)) {
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), TanStackRouterVite({ autoCodeSplitting: true })],
   server: {
     proxy: {
       '^/api': {

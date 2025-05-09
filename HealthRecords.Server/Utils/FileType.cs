@@ -1,6 +1,6 @@
 namespace HealthRecords.Server.Utils;
 
-public class FileType {
+public static class FileType {
     private static readonly string[] Image = [
         "image/jpeg", "image/gif", "image/png", "image/tiff", "image/apng", "image/avif", "image/bmp",
         "image/vnd.microsoft.icon", "image/svg+xml", "image/webp"

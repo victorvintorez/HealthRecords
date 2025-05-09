@@ -3,6 +3,7 @@ export type ApiOptions = {
 		[key: string]: {
 			mutationKey: string,
 			mutationFn: Function,
+			invalidates?: string[],
 		}
 	},
 	query?: {
@@ -12,7 +13,10 @@ export type ApiOptions = {
 
 		}
 	},
-	infiniteQuery: {
-		[key: string]:
+	infiniteQuery?: {
+		[key: string]: {
+			queryKey: string,
+			queryFn: Function,
+		}
 	},
 }
