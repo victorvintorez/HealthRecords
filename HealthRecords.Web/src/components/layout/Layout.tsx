@@ -1,11 +1,9 @@
 import '@mantine/core/styles.css'
 import '@mantine/notifications/styles.css'
-import '@mantine/nprogress/styles.css'
 import '@mantine/dates/styles.css'
 import {FC, PropsWithChildren} from "react";
 import {useDisclosure} from "@mantine/hooks";
 import {AppShell, MantineProvider} from "@mantine/core";
-import {NavigationProgress} from "@mantine/nprogress";
 import {Notifications} from "@mantine/notifications";
 import {ModalsProvider} from "@mantine/modals";
 import Header from "./Header.tsx";
@@ -17,10 +15,9 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
 
 	return (
 		<MantineProvider defaultColorScheme="auto">
-			<NavigationProgress/>
 			<Notifications/>
 			<ModalsProvider>
-				<AppShell withBorder header={{ height: 80 }} navbar={{ width: 350, breakpoint: "lg", collapsed: { desktop: false, mobile: !navbarOpened }}}>
+				<AppShell withBorder header={{ height: 80 }} navbar={{ width: 300, breakpoint: "md", collapsed: { desktop: false, mobile: !navbarOpened }}}>
 					<Header navbarOpened={navbarOpened} toggleNavbar={toggleNavbar}/>
 					<Navigation/>
 					<MainContent>

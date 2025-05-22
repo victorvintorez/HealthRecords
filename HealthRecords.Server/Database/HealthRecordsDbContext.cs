@@ -92,6 +92,11 @@ public class HealthRecordsDbContext(DbContextOptions<HealthRecordsDbContext> opt
             .HasOne(e => e.AttendingDoctor)
             .WithMany(navigationName: null)
             .OnDelete(DeleteBehavior.NoAction);
+        // HealthRecord.Hospital -> Hospital
+        modelBuilder.Entity<HealthRecord>()
+            .HasOne(e => e.Hospital)
+            .WithMany(navigationName: null)
+            .OnDelete(DeleteBehavior.NoAction);
         // HealthRecord.Procedures -> Procedure
         modelBuilder.Entity<HealthRecord>()
             .HasMany(e => e.Procedures)

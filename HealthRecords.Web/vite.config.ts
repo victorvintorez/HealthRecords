@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
+import { resolve } from "node:path";
 
 const appdata = platform() === 'win32' ? process.env.APPDATA : platform() === 'linux' ? `${process.env.HOME}/.local/share` : '';
 const key = `${appdata}/HealthRecords/cert.key`;
@@ -38,6 +39,16 @@ export default defineConfig({
     https: {
       key: readFileSync(key),
       cert: readFileSync(cert),
+    }
+  },
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src'),
+      '@assets': resolve(__dirname, 'src/assets'),
+      '@components': resolve(__dirname, 'src/components'),
+      '@ctypes': resolve(__dirname, 'src/types'),
+      '@api': resolve(__dirname, 'src/api'),
+      '@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs'
     }
   }
 })

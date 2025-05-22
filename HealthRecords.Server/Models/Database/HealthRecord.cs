@@ -19,6 +19,7 @@ public class HealthRecord {
     // Relationships
     public required int PatientId { get; set; }
     public virtual required Patient Patient { get; set; }
+    public virtual required Hospital Hospital { get; set; }
     public virtual required Staff AttendingDoctor { get; set; }
     public virtual ICollection<Procedure> Procedures { get; } = new List<Procedure>();
     public virtual ICollection<FileBlob> Files { get; } = new List<FileBlob>();

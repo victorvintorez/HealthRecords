@@ -6,7 +6,7 @@
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 		<SpaRoot>../HealthRecords.Web</SpaRoot>
 		<SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
-		<SpaProxyLaunchUrl>https://localhost:8082</SpaProxyLaunchUrl>
+		<SpaProxyServerUrl>https://localhost:8082</SpaProxyServerUrl>
 	</PropertyGroup>
 
 	<ItemGroup>

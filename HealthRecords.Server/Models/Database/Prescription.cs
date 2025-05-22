@@ -16,8 +16,6 @@ public class Prescription {
     public required FrequencyUnit FrequencyUnit { get; set; }
     public required int Duration { get; set; }
     public required DurationUnit DurationUnit { get; set; }
-    [StringLength(255)]
-    public required string Reason { get; set; }
     
     // Relationships
     public required int PatientId { get; set; }

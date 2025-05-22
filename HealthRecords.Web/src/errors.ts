@@ -1,0 +1,27 @@
+export class UnauthorizedError extends Error {
+	constructor() {
+		super("Unauthorized")
+		this.name = "UnauthorizedError"
+	}
+}
+
+export class NotFoundError extends Error {
+	constructor() {
+		super("Not Found")
+		this.name = "NotFoundError"
+	}
+}
+
+export class ValidationError extends Error {
+	constructor(message: string) {
+		super(`Validation Error: ${message}`)
+		this.name = "ValidationError"
+	}
+}
+
+export class UnexpectedStatusError extends Error {
+	constructor(status: number) {
+		super(`Unexpected status: ${status}`)
+		this.name = "UnexpectedStatusError"
+	}
+}

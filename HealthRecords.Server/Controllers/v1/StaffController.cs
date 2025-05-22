@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Azure.Storage.Blobs;
 using HealthRecords.Server.Database;
 using HealthRecords.Server.Models.Database;
@@ -10,7 +11,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Azure;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace HealthRecords.Server.Controllers.v1;
 
@@ -21,15 +22,17 @@ public class StaffController(
     ILogger<StaffController> logger,
     HealthRecordsDbContext db,
     UserManager<IdentityUser> userManager,
-    IAzureClientFactory<BlobServiceClient> blobServiceClient,
-    SignInManager<IdentityUser> signInManager) : ControllerBase {
+    IUserStore<IdentityUser> userStore,
+    BlobServiceClient blobServiceClient,
+    SignInManager<IdentityUser> signInManager,
+    EmailAddressAttribute emailAddressAttribute) : ControllerBase {
     [HttpGet]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<Results<Ok<StaffDto>, InternalServerError<string>, NotFound<string>>> GetStaff() {
+    public async Task<Results<Ok<StaffDto>, InternalServerError<string>, NotFound<string>>> GetStaffSelf() {
         // Get the currently authorized user's ID
         var userId = userManager.GetUserId(User);
         if (string.IsNullOrEmpty(userId)) {
@@ -126,21 +129,50 @@ public class StaffController(
     }
 
     [HttpPost]
-    [Authorize]
+    [Consumes("multipart/form-data")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<Results<Ok, BadRequest<string>, InternalServerError<string>>> CreateStaff(
         [FromBody] CreateStaffFb body) {
-        // Get the currently authorized user's ID
+        // Check a user isn't already logged in
+        if (!string.IsNullOrEmpty(userManager.GetUserId(User))) {
+            return TypedResults.BadRequest("User is already logged in.");
+        }
+        
+        // Check an account with email doesn't already exist
+        if (await userManager.FindByEmailAsync(body.Email) != null) {
+            return TypedResults.BadRequest("Email is already in use.");
+        }
+
+        // Create a user account
+        if (string.IsNullOrEmpty(body.Email) || !emailAddressAttribute.IsValid(body.Email)) {
+            return TypedResults.BadRequest("Email is invalid.");
+        }
+
+        var emailStore = (IUserEmailStore<IdentityUser>)userStore;
+        var user = new IdentityUser();
+        await userStore.SetUserNameAsync(user, body.Email, CancellationToken.None);
+        await emailStore.SetEmailAsync(user, body.Email, CancellationToken.None);
+        IdentityResult creationResult = await userManager.CreateAsync(user, body.Password);
+
+        if (!creationResult.Succeeded) {
+            return TypedResults.BadRequest(creationResult.Errors.First().Description);
+        }
+        
+        // Log in freshly created user
+        signInManager.AuthenticationScheme = IdentityConstants.ApplicationScheme;
+        
+        SignInResult loginResult = await signInManager.PasswordSignInAsync(body.Email, body.Password, true, true);
+
+        if (!loginResult.Succeeded) {
+            return TypedResults.InternalServerError("Couldn't log in user.");
+        }
+        
+        // Retrieve the user's ID
         var userId = userManager.GetUserId(User);
         if (string.IsNullOrEmpty(userId)) {
             return TypedResults.InternalServerError("Couldn't retrieve user ID.");
-        }
-
-        // Check if the user is already a staff member
-        if (await db.Staff.AnyAsync(s => s.AccountId == userId)) {
-            return TypedResults.BadRequest("User already has a staff member record.");
         }
 
         // Check if hospital exists
@@ -157,7 +189,6 @@ public class StaffController(
         // Upload the profile image to blob storage
         var filename = $"{userId}_profile-img.{body.ProfileImage.FileName.Split(".").Last()}";
         BlobClient blobClient = blobServiceClient
-            .CreateClient("HealthRecordsBlobStorage")
             .GetBlobContainerClient("staff-profile-images").GetBlobClient(filename);
 
         try {
@@ -216,7 +247,6 @@ public class StaffController(
 
         // Delete profile image from blob storage
         BlobClient blobClient = blobServiceClient
-            .CreateClient("HealthRecordsBlobStorage")
             .GetBlobContainerClient("staff-profile-images")
             .GetBlobClient(staff.ProfileImage.FileName);
         await blobClient.DeleteIfExistsAsync();
@@ -257,7 +287,6 @@ public class StaffController(
 
         // Delete profile image from blob storage
         BlobClient blobClient = blobServiceClient
-            .CreateClient("HealthRecordsBlobStorage")
             .GetBlobContainerClient("staff-profile-images")
             .GetBlobClient(staff.ProfileImage.FileName);
         await blobClient.DeleteIfExistsAsync();
@@ -275,6 +304,7 @@ public class StaffController(
 
     [HttpPatch]
     [Authorize]
+    [Consumes("multipart/form-data")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -336,7 +366,6 @@ public class StaffController(
             // Upload the profile image to blob storage
             var filename = $"{user.Id}_profile-img.{body.ProfileImage.FileName.Split(".").Last()}";
             BlobClient blobClient = blobServiceClient
-                .CreateClient("HealthRecordsBlobStorage")
                 .GetBlobContainerClient("staff-profile-images").GetBlobClient(filename);
 
             try {
@@ -348,7 +377,6 @@ public class StaffController(
                 };
                 // Delete old profile image from blob storage
                 BlobClient oldBlobClient = blobServiceClient
-                    .CreateClient("HealthRecordsBlobStorage")
                     .GetBlobContainerClient("staff-profile-images")
                     .GetBlobClient(staff.ProfileImage.FileName);
                 await oldBlobClient.DeleteIfExistsAsync();
@@ -368,6 +396,7 @@ public class StaffController(
 
     [HttpPatch("{id:int}", Name = "UpdateStaffById")]
     [Authorize(Roles = "Administrator")]
+    [Consumes("multipart/form-data")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -434,7 +463,6 @@ public class StaffController(
             // Upload the profile image to blob storage
             var filename = $"{user.Id}_profile-img.{body.ProfileImage.FileName.Split(".").Last()}";
             BlobClient blobClient = blobServiceClient
-                .CreateClient("HealthRecordsBlobStorage")
                 .GetBlobContainerClient("staff-profile-images").GetBlobClient(filename);
 
             try {
@@ -446,7 +474,6 @@ public class StaffController(
                 };
                 // Delete old profile image from blob storage
                 BlobClient oldBlobClient = blobServiceClient
-                    .CreateClient("HealthRecordsBlobStorage")
                     .GetBlobContainerClient("staff-profile-images")
                     .GetBlobClient(staff.ProfileImage.FileName);
                 await oldBlobClient.DeleteIfExistsAsync();
