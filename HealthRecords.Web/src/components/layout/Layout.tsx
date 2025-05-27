@@ -1,7 +1,8 @@
 import '@mantine/core/styles.css'
 import '@mantine/notifications/styles.css'
 import '@mantine/dates/styles.css'
-import {FC, PropsWithChildren} from "react";
+import './Layout.module.css'
+import type {FC, PropsWithChildren} from "react";
 import {useDisclosure} from "@mantine/hooks";
 import {AppShell, MantineProvider} from "@mantine/core";
 import {Notifications} from "@mantine/notifications";

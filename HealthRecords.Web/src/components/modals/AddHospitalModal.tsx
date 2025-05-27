@@ -1,4 +1,4 @@
-import { CreateHospitalSchema, CreateHospitalType } from '@ctypes/hospital.ts';
+import { CreateHospitalSchema, type CreateHospitalType } from '@ctypes/hospital.ts';
 import { HospitalAPI } from '@api/hospital.ts';
 import { Button, Stack, TextInput, Title } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
@@ -36,7 +36,7 @@ export const AddHospitalModal = () => {
 				icon: <IconCheck />,
 				withBorder: true,
 			});
-			modals.closeAll();
+			modals.close("add-hospital-modal");
 		},
 		onError: (error) => {
 			notifications.show({
@@ -86,7 +86,7 @@ export const AddHospitalModal = () => {
 						variant="outline"
 						color="red"
 						fullWidth
-						onClick={modals.closeAll}
+						onClick={() => modals.close("add-hospital-modal")}
 					>
 						Cancel!
 					</Button>

@@ -1,8 +1,10 @@
 import { AuthAPI } from '@api/auth.ts';
 import { StaffAPI } from '@api/staff.ts';
-import { AppShell, Avatar, Button, Divider, Menu, Text } from '@mantine/core';
+import { AppShell, Avatar, Button, Divider, Group, Menu, Text, UnstyledButton } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import {
+	IconChevronRight,
+	IconChevronUp,
 	IconExclamationCircle,
 	IconLogin,
 	IconLogout,
@@ -70,25 +72,34 @@ const Navigation: FC = () => {
 			<Divider my="sm" />
 			<AppShell.Section>
 				{isAuthenticated ? (
-					<Menu shadow="md" width={200} position="top-end">
+					<Menu shadow="md" width={200} position="top" withArrow>
 						<Menu.Target>
-							<Button
-								fullWidth
+							<UnstyledButton
+								w="100%"
 								size="xl"
-								variant="light"
-								radius={0}
-								leftSection={
-									<Avatar
-										src={staffData.profileImageUrl}
-										alt={staffData.fullName}
-										variant="transparent"
-										radius={0}
-										size="lg"
-									/>
-								}
+								p="md"
+								style={{
+									color: 'var(--mantine-color-text)',
+								}}
 							>
-								<Text size="xl">{staffData.fullName}</Text>
-							</Button>
+								<Group>
+									<Avatar
+											src={staffData.profileImageUrl}
+											alt={staffData.fullName}
+											variant="transparent"
+											radius={0}
+											size="lg"
+										/>
+										<div style={{ flex: 1 }}>
+											<Text size="lg">{staffData.fullName}</Text>
+											<Text size="sm" c="dimmed">
+												{staffData.department}
+											</Text>
+										</div>
+										<IconChevronRight className='mantine-visible-from-md' size={16} />
+										<IconChevronUp className='mantine-hidden-from-md' size={16} />
+								</Group>
+							</UnstyledButton>
 						</Menu.Target>
 
 						<Menu.Dropdown>

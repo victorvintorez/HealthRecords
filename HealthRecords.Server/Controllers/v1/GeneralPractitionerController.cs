@@ -22,10 +22,9 @@ public class GeneralPractitionerController(
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<Results<Ok<List<GeneralPractitionerDto>>, NotFound<string>>> GetGeneralPractitionerAll()
     {
-        var gps = await db.GeneralPractitioners
+        return TypedResults.Ok(await db.GeneralPractitioners
             .Select(gp => new GeneralPractitionerDto {
                 Id = gp.Id,
                 SurgeryName = gp.SurgeryName,
@@ -34,12 +33,7 @@ public class GeneralPractitionerController(
                 Email = gp.Email,
                 Website = gp.Website
             })
-            .ToListAsync();
-        if (gps.Count == 0)
-        {
-            return TypedResults.NotFound("No general practitioners found.");
-        }
-        return TypedResults.Ok(gps);
+            .ToListAsync());
     }
 
     // Get a general practitioner by ID

@@ -1,0 +1,6 @@
+@media(max-width: 62em) {
+    :root {
+        --app-shell-navbar-width:300px !important;
+        --app-shell-navbar-offset:0px !important;
+    }
+}

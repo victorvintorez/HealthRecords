@@ -127,6 +127,7 @@ export const HospitalInput = forwardRef<HTMLInputElement, HospitalInputProps>(
 						color="gray"
 						onClick={() =>
 							modals.open({
+								id: "add-hospital-modal",
 								children: <AddHospitalModal />,
 								withCloseButton: false,
 							})

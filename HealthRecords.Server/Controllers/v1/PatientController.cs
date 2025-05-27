@@ -11,6 +11,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HealthRecords.Server.Controllers.v1;
 
+[ApiController]
+[Route("api/v1/[controller]")]
+[Produces("application/json")]
 public class PatientController(
     ILogger<AuthController> logger,
     HealthRecordsDbContext db) : ControllerBase {
@@ -18,7 +21,6 @@ public class PatientController(
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<Results<Ok<PatientPageDto>, NotFound<string>, InternalServerError<string>>> GetPatientAll([FromQuery] int page = 0) {
         const int top = 20;
@@ -41,11 +43,7 @@ public class PatientController(
                 Height = p.Height,
                 BloodType = p.BloodType.ToString()
             }).ToListAsync();
-        
-        if (patients.Count == 0) {
-            return TypedResults.NotFound("Couldn't find any records.");
-        }
-        
+            
         return TypedResults.Ok(new PatientPageDto {
             Patients = patients,
             Cursor = patients.Count == top ? page + 1 : null

@@ -4,6 +4,7 @@ using HealthRecords.Server.Database;
 using HealthRecords.Server.Models.Database;
 using HealthRecords.Server.Models.Enum;
 using HealthRecords.Server.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
@@ -39,6 +40,9 @@ builder.Services.AddAzureClients(clientBuilder => {
 // Setup SAS Token Service
 builder.Services.AddScoped<SasTokenService>();
 
+// Setup Session Token Service
+builder.Services.AddSingleton<ITicketStore, SessionTokenService>();
+
 // Setup Authentication
 builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme).AddIdentityCookies();
 builder.Services.AddAuthorization();
@@ -47,7 +51,8 @@ builder.Services.AddIdentityCore<IdentityUser>()
     .AddClaimsPrincipalFactory<UserClaimsPrincipalFactory<IdentityUser, IdentityRole>>()
     .AddSignInManager<SignInManager<IdentityUser>>()
     .AddEntityFrameworkStores<HealthRecordsDbContext>();
-builder.Services.ConfigureApplicationCookie(opts => {
+builder.Services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme).Configure<ITicketStore>((opts, store) => {
+    opts.SessionStore = store;
     opts.Events.OnRedirectToLogin = context => {
         context.Response.StatusCode = 401;
         return Task.CompletedTask;

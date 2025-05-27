@@ -75,7 +75,6 @@ public class StaffController(
     [Authorize(Roles = "Administrator")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<Results<Ok<StaffPageDto>, NotFound<string>>> GetStaffAll([FromQuery] int page = 0) {
         const int top = 20;
@@ -89,10 +88,6 @@ public class StaffController(
             .Skip(skip)
             .Take(top)
             .ToListAsync();
-
-        if (staffRecords.Count == 0) {
-            return TypedResults.NotFound("Couldn't find any records.");
-        }
 
         var staffList = new List<StaffDto>();
         foreach (var s in staffRecords) {

@@ -1,4 +1,4 @@
-import { LoginSchema, LoginType } from '@ctypes/auth.ts';
+import { LoginSchema, type LoginType } from '@ctypes/auth.ts';
 import { AuthAPI } from '@api/auth.ts';
 import { CustomAnchor } from '@components/primitives/Link.tsx';
 import { AuthRouteParams } from '@ctypes/misc';

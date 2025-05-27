@@ -72,3 +72,7 @@ export const TextFileSchema = FileSchema.refine((file) =>
 export const AuthRouteParams = z.object({
 	redirect: z.string().optional(),
 });
+
+export const IndexRouteParams = z.object({
+	fullname: z.string().optional(),
+});

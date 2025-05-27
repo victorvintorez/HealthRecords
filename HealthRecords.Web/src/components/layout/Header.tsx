@@ -21,7 +21,7 @@ import {
 	IconX,
 } from '@tabler/icons-react';
 import { useNavigate } from '@tanstack/react-router';
-import { FC } from 'react';
+import type { FC } from 'react';
 
 interface HeaderProps {
 	navbarOpened: boolean;
@@ -95,7 +95,7 @@ const Header: FC<HeaderProps> = ({ navbarOpened, toggleNavbar }) => {
 							onClick={async () => {
 								await fullNameSearchField.validate();
 								if (!fullNameSearchField.error) {
-									let search = fullNameSearchField.getValue();
+									const search = fullNameSearchField.getValue();
 									fullNameSearchField.reset();
 									return navigate({
 										to: '/',

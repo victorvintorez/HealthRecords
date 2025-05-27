@@ -20,22 +20,15 @@ public class HospitalController(
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<Results<Ok<List<HospitalDto>>, NotFound<string>>> GetHospitalAll() {
-        var hospitals = await db.Hospitals
+        return TypedResults.Ok(await db.Hospitals
             .OrderBy(h => h.Name)
             .Select(h => new HospitalDto {
                 Id = h.Id,
                 Name = h.Name,
                 Address = h.Address,
                 PhoneNumber = h.PhoneNumber,
-            }).ToListAsync();
-
-        if (hospitals.Count == 0) {
-            return TypedResults.NotFound("Couldn't find any records.");
-        }
-
-        return TypedResults.Ok(hospitals);
+            }).ToListAsync());
     }
 
     // Get a hospital by ID
