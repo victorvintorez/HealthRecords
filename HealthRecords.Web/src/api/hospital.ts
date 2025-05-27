@@ -148,7 +148,7 @@ export const HospitalAPI = {
 			mutationKey: ['deleteHospitalById'],
 			mutationFn: deleteHospitalById,
 			invalidates: (id: number) => [
-				['hospital', id.toString()],
+				['hospital', { id: id.toString() }],
 				['hospital', 'all'],
 			],
 		},
@@ -156,7 +156,7 @@ export const HospitalAPI = {
 			mutationKey: ['updateHospitalById'],
 			mutationFn: updateHospitalById,
 			invalidates: (id: number) => [
-				['hospital', id.toString()],
+				['hospital', { id: id.toString() }],
 				['hospital', 'all'],
 			],
 		},
@@ -165,10 +165,12 @@ export const HospitalAPI = {
 		hospitalAll: {
 			queryKey: ['hospital', 'all'],
 			queryFn: getHospitalAll,
+			staleTime: 1000 * 60 * 60 * 6, // 6 hours
 		},
 		hospitalById: {
-			queryKey: (id: number) => ['hospital', id.toString()],
+			queryKey: (id: number) => ['hospital', { id: id.toString() }],
 			queryFn: getHospitalById,
+			staleTime: Infinity,
 		},
 	},
 };

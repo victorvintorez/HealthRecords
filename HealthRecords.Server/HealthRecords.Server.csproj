@@ -22,6 +22,7 @@
 		</PackageReference>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4" />
 		<PackageReference Include="Microsoft.Extensions.Azure" Version="1.11.0" />
+		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.5" />
 		<PackageReference Include="NReco.Logging.File" Version="1.2.2" />
 	</ItemGroup>
 
@@ -48,7 +49,7 @@
 	<Target Name="BuildAndPublishWeb" BeforeTargets="Publish">
 		<MakeDir Directories="$(PublishDir)temp" Condition="!Exists('$(PublishDir)temp')" />
 		<Exec Command="npm run build" WorkingDirectory="../HealthRecords.Web" />
-		<RemoveDir Directories="$(PublishDir)wwwroot"/>
+		<RemoveDir Directories="$(PublishDir)wwwroot" />
 		<ItemGroup>
 			<ClientBuildFiles Include="..\HealthRecords.Web\dist\**\*.*" />
 		</ItemGroup>

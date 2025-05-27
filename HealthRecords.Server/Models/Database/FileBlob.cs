@@ -11,5 +11,5 @@ public class FileBlob {
     [StringLength(255)]
     public required string ContentType { get; set; }
     [StringLength(255)]
-    public required string Url { get; set; }
+    public required string Container { get; set; }
 }

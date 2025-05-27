@@ -1,7 +1,6 @@
-namespace HealthRecords.Server.Models.Dto;
+namespace HealthRecords.Server.Models.FromBody;
 
-public class PatientDto {
-    public required int Id { get; set; }
+public class CreatePatientFb {
     public required string FullName { get; set; }
     public required string Address { get; set; }
     public required string PhoneNumber { get; set; }
@@ -11,9 +10,5 @@ public class PatientDto {
     public required float Weight { get; set; }
     public required float Height { get; set; }
     public required string BloodType { get; set; }
-    public int? GeneralPractitionerId { get; set; }
-    public ICollection<int>? AllergyIds { get; set; }
-    public ICollection<int>? EmergencyContactIds { get; set; }
-    public ICollection<int>? PrescriptionIds { get; set; }
-    public ICollection<int>? HealthRecordIds { get; set; }
+    public required int GeneralPractitionerId { get; set; }
 }

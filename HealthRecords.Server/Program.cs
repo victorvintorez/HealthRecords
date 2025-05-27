@@ -3,8 +3,8 @@ using Azure.Storage.Blobs;
 using HealthRecords.Server.Database;
 using HealthRecords.Server.Models.Database;
 using HealthRecords.Server.Models.Enum;
+using HealthRecords.Server.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 using NReco.Logging.File;
@@ -22,17 +22,49 @@ if (builder.Environment.IsDevelopment()) {
 }
 
 // Setup Database (Required for Authentication)
-builder.Services.AddDbContext<HealthRecordsDbContext>(options => 
+builder.Services.AddDbContext<HealthRecordsDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
+
+// Setup Cache (Required for SAS Token Service)
+builder.Services.AddStackExchangeRedisCache(options => {
+    options.Configuration = builder.Configuration.GetConnectionString("CacheConnection");
+    options.InstanceName = "HealthRecordsCache";
+});
 
 // Setup Azure Blob Storage
 builder.Services.AddAzureClients(clientBuilder => {
     clientBuilder.AddBlobServiceClient(builder.Configuration.GetConnectionString("BlobConnection"));
 });
 
+// Setup SAS Token Service
+builder.Services.AddScoped<SasTokenService>();
+
 // Setup Authentication
+builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme).AddIdentityCookies();
 builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddRoles<IdentityRole>().AddEntityFrameworkStores<HealthRecordsDbContext>();
+builder.Services.AddIdentityCore<IdentityUser>()
+    .AddRoles<IdentityRole>()
+    .AddClaimsPrincipalFactory<UserClaimsPrincipalFactory<IdentityUser, IdentityRole>>()
+    .AddSignInManager<SignInManager<IdentityUser>>()
+    .AddEntityFrameworkStores<HealthRecordsDbContext>();
+builder.Services.ConfigureApplicationCookie(opts => {
+    opts.Events.OnRedirectToLogin = context => {
+        context.Response.StatusCode = 401;
+        return Task.CompletedTask;
+    };
+    opts.Events.OnRedirectToAccessDenied = context => {
+        context.Response.StatusCode = 403;
+        return Task.CompletedTask;
+    };
+    opts.Events.OnRedirectToLogout = context => {
+        context.Response.StatusCode = 401;
+        return Task.CompletedTask;
+    };
+    opts.Events.OnRedirectToReturnUrl = context => {
+        context.Response.StatusCode = 401;
+        return Task.CompletedTask;
+    };
+});
 
 // Setup Controllers
 builder.Services.AddControllers();
@@ -47,7 +79,8 @@ await using (AsyncServiceScope scope = app.Services.CreateAsyncScope()) {
     var db = scope.ServiceProvider.GetService<HealthRecordsDbContext>();
     if (db != null) {
         await db.Database.MigrateAsync();
-    } else {
+    }
+    else {
         throw new Exception("Could not perform database migrations.");
     }
 }
@@ -55,7 +88,7 @@ await using (AsyncServiceScope scope = app.Services.CreateAsyncScope()) {
 // Create Azure Blob Storage Containers
 await using (AsyncServiceScope scope = app.Services.CreateAsyncScope()) {
     var blobServiceClient = scope.ServiceProvider.GetRequiredService<BlobServiceClient>();
-    
+
     blobServiceClient.GetBlobContainerClient("staff-profile-images").CreateIfNotExists();
 }
 
@@ -70,10 +103,10 @@ await using (AsyncServiceScope scope = app.Services.CreateAsyncScope()) {
     var dbContext = scope.ServiceProvider.GetRequiredService<HealthRecordsDbContext>();
     var blobServiceClient = scope.ServiceProvider.GetRequiredService<BlobServiceClient>();
     var emailStore = (IUserEmailStore<IdentityUser>)userStore;
-    
-    var email = builder.Configuration.GetSection("DefaultAdminAccount").Value ?? "admin@admin.net";
-    var password = builder.Configuration.GetSection("DefaultAdminPassword").Value ?? "Admin123!";
-    
+
+    var email = builder.Configuration.GetSection("DefaultAdminAccount").GetSection("Email").Value ?? "admin@admin.net";
+    var password = builder.Configuration.GetSection("DefaultAdminAccount").GetSection("Password").Value ?? "Admin123!";
+
     // Check if the administrator account exists
     if (await userManager.FindByEmailAsync(email) == null) {
         // Create the administrator account
@@ -82,7 +115,7 @@ await using (AsyncServiceScope scope = app.Services.CreateAsyncScope()) {
             await userStore.SetUserNameAsync(user, email, CancellationToken.None);
             await emailStore.SetEmailAsync(user, email, CancellationToken.None);
             IdentityResult creationResult = await userManager.CreateAsync(user, password);
-            
+
             if (!creationResult.Succeeded) {
                 throw new Exception(creationResult.Errors.First().Description);
             }
@@ -91,19 +124,19 @@ await using (AsyncServiceScope scope = app.Services.CreateAsyncScope()) {
             throw new Exception("Administrator Account Email address is invalid!");
         }
     }
-    
+
     IdentityUser? admin = await userManager.FindByEmailAsync(email);
     if (admin == null) {
         throw new Exception("Couldn't find administrator account.");
     }
-    
+
     // Check if the administrator account is an administrator
     if (!await userManager.IsInRoleAsync(admin, "Administrator")) {
         // Add the administrator role
         await roleManager.CreateAsync(new IdentityRole("Administrator"));
         await userManager.AddToRoleAsync(admin, "Administrator");
     }
-    
+
     // Check if "Admin Hospital" already exists
     if (await dbContext.Hospitals.FirstOrDefaultAsync(s => s.Name == "Admin") == null) {
         dbContext.Hospitals.Add(new Hospital {
@@ -118,8 +151,9 @@ await using (AsyncServiceScope scope = app.Services.CreateAsyncScope()) {
             throw new Exception("Couldn't create administrator hospital record.");
         }
     }
+
     Hospital adminHospital = await dbContext.Hospitals.FirstAsync(s => s.Name == "Admin");
-    
+
     // Check if a staff profile exists for Administrator Account
     if (await dbContext.Staff.FirstOrDefaultAsync(s => s.AccountId == admin.Id) == null) {
         // Create the administrator profile
@@ -144,10 +178,10 @@ await using (AsyncServiceScope scope = app.Services.CreateAsyncScope()) {
             ProfileImage = new FileBlob {
                 FileName = filename,
                 ContentType = "image/png",
-                Url = blobClient.Uri.ToString()
+                Container = blobClient.BlobContainerName
             }
         });
-        
+
         try {
             await dbContext.SaveChangesAsync();
         }
@@ -156,6 +190,7 @@ await using (AsyncServiceScope scope = app.Services.CreateAsyncScope()) {
         }
     }
 }
+
 Console.WriteLine("Administrator account setup complete!");
 
 // Configure the HTTP request pipeline.
@@ -170,22 +205,12 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGroup("/api/v1/auth/").MapIdentityApi<IdentityUser>();
-app.MapPost("/api/v1/auth/logout", async (SignInManager<IdentityUser> signInManager, [FromBody] object obj) => {
-    if (obj == null) return Results.Unauthorized();
-    await signInManager.SignOutAsync();
-    return Results.Ok();
-}).WithOpenApi().RequireAuthorization();
-
 app.MapControllers();
 
 // SPA Support
 app.UseDefaultFiles();
 app.UseStaticFiles();
-app.MapWhen(ctx => !ctx.Request.Path.StartsWithSegments("/api"), fallback => {
-    fallback.UseEndpoints(endpoint => {
-        endpoint.MapFallbackToFile("index.html");
-    });
-});
+app.MapWhen(ctx => !ctx.Request.Path.StartsWithSegments("/api"),
+    fallback => { fallback.UseEndpoints(endpoint => { endpoint.MapFallbackToFile("index.html"); }); });
 
 app.Run();

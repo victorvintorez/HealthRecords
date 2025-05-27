@@ -53,6 +53,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 				await queryClient.ensureQueryData({
 					queryKey: StaffAPI.query.staffSelf.queryKey,
 					queryFn: StaffAPI.query.staffSelf.queryFn,
+					staleTime: StaffAPI.query.staffSelf.staleTime,
 				});
 			} catch (e) {
 				if (e instanceof UnauthorizedError && !location.href.includes('auth')) {

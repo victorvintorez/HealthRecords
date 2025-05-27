@@ -18,7 +18,6 @@ public class HospitalController(
 ) : ControllerBase {
     // Get all hospitals
     [HttpGet]
-    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -64,8 +63,7 @@ public class HospitalController(
 
     // Create a hospital
     [HttpPost]
-    [Authorize(Policy = "Administrator")]
-    [Consumes("application/json")]
+    [Authorize(Roles = "Administrator")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -87,7 +85,8 @@ public class HospitalController(
         try {
             await db.SaveChangesAsync();
         }
-        catch (Exception) {
+        catch (Exception ex) {
+            logger.LogError(ex, "Couldn't create new hospital record");
             return TypedResults.InternalServerError("Couldn't create new hospital record.");
         }
 
@@ -96,7 +95,7 @@ public class HospitalController(
 
     // Delete a Hospital by ID
     [HttpDelete("{id:int}", Name = "DeleteHospitalById")]
-    [Authorize(Policy = "Administrator")]
+    [Authorize(Roles = "Administrator")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -114,7 +113,8 @@ public class HospitalController(
         try {
             await db.SaveChangesAsync();
         }
-        catch (Exception) {
+        catch (Exception ex) {
+            logger.LogError(ex, "Couldn't delete hospital record");
             return TypedResults.InternalServerError("Couldn't delete hospital record.");
         }
 
@@ -123,8 +123,7 @@ public class HospitalController(
     
     // Update a Hospital by ID
     [HttpPatch("{id:int}", Name = "UpdateHospitalById")]
-    [Authorize(Policy = "Administrator")]
-    [Consumes("application/json")]
+    [Authorize(Roles = "Administrator")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -156,7 +155,8 @@ public class HospitalController(
         try {
             await db.SaveChangesAsync();
         }
-        catch (Exception) {
+        catch (Exception ex) {
+            logger.LogError(ex, "Couldn't update hospital record");
             return TypedResults.InternalServerError("Couldn't update hospital record.");
         }
         

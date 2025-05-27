@@ -5,41 +5,12 @@ import {
 	ValidationError,
 } from '../errors.ts';
 import {
-	CreateStaffType,
 	StaffPageResponseSchema,
 	StaffPageResponseType,
 	StaffSchema,
 	StaffType,
 	UpdateStaffType,
 } from '../types/staff.ts';
-
-// Create a staff member and user account
-const postCreateStaff = async (input: CreateStaffType): Promise<void> => {
-	const body = new FormData();
-	body.append('Email', input.email);
-	body.append('Password', input.password);
-	body.append('FullName', input.fullName);
-	body.append('Department', input.department);
-	body.append('HospitalId', input.hospitalId.toString());
-	body.append('ProfileImage', input.profileImage);
-
-	const res = await fetch('/api/v1/staff', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'multipart/form-data',
-		},
-		body,
-	});
-
-	switch (res.status) {
-		case 200:
-			return;
-		case 400:
-			throw new ValidationError(await res.text());
-		default:
-			throw new UnexpectedStatusError(res.status);
-	}
-};
 
 const getStaffSelf = async (): Promise<StaffType> => {
 	const res = await fetch('/api/v1/staff', {
@@ -227,11 +198,6 @@ const updateStaffById = async (
 
 export const StaffAPI = {
 	mutation: {
-		createStaff: {
-			mutationKey: ['createStaff'],
-			mutationFn: postCreateStaff,
-			invalidates: ['staff', 'self'],
-		},
 		deleteStaff: {
 			mutationKey: ['deleteStaff'],
 			mutationFn: deleteStaff,
@@ -240,7 +206,7 @@ export const StaffAPI = {
 		deleteStaffById: {
 			mutationKey: ['deleteStaffById'],
 			mutationFn: deleteStaffById,
-			invalidates: (id: number) => ['staff', id.toString()],
+			invalidates: (id: number) => ['staff', { id: id.toString() }],
 		},
 		updateStaff: {
 			mutationKey: ['updateStaff'],
@@ -250,23 +216,26 @@ export const StaffAPI = {
 		updateStaffById: {
 			mutationKey: ['updateStaffById'],
 			mutationFn: updateStaffById,
-			invalidates: (id: number) => ['staff', id.toString()],
+			invalidates: (id: number) => ['staff', { id: id.toString() }],
 		},
 	},
 	query: {
 		staffSelf: {
 			queryKey: ['staff', 'self'],
 			queryFn: getStaffSelf,
+			staleTime: 1000 * 60 * 30, // 30 Minutes
 		},
 		staffById: {
-			queryKey: (id: number) => ['staff', id.toString()],
+			queryKey: (id: number) => ['staff', { id: id.toString() }],
 			queryFn: getStaffById,
+			staleTime: Infinity,
 		},
 	},
 	infiniteQuery: {
 		staffAll: {
 			queryKey: ['staff', 'all'],
 			queryFn: getStaffAll,
+			staleTime: Infinity,
 		},
 	},
 };
