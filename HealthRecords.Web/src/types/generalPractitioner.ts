@@ -5,8 +5,8 @@ export const GeneralPractitionerSchema = z.object({
 	surgeryName: z.string(),
 	address: z.string(),
 	phoneNumber: z.string(),
-	email: z.string().optional(),
-	website: z.string().optional(),
+	email: z.string().nullable().optional(),
+	website: z.string().nullable().optional(),
 });
 export type GeneralPractitionerType = z.infer<typeof GeneralPractitionerSchema>;
 
@@ -17,8 +17,8 @@ export const CreateGeneralPractitionerSchema = z.object({
 	surgeryName: z.string(),
 	address: z.string(),
 	phoneNumber: z.string(),
-	email: z.string().optional(),
-	website: z.string().optional(),
+	email: z.string().nullable().optional(),
+	website: z.string().nullable().optional(),
 });
 export type CreateGeneralPractitionerType = z.infer<typeof CreateGeneralPractitionerSchema>;
 

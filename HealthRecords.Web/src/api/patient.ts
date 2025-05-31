@@ -5,6 +5,7 @@ import {
 	UnauthorizedError,
 	UnexpectedStatusError,
 	ValidationError,
+	APIParseError,
 } from '../errors';
 
 export const getPatientAll = async (page = 0): Promise<PatientListType> => {
@@ -15,9 +16,9 @@ export const getPatientAll = async (page = 0): Promise<PatientListType> => {
 	});
 	switch (res.status) {
 		case 200: {
-			const response = PatientListSchema.safeParse((await res.json()).patients ?? []);
+			const response = PatientListSchema.safeParse(await res.json());
 			if (response.success) return response.data;
-			throw new ValidationError(response.error.message);
+			throw new APIParseError();
 		}
 		case 401: throw new UnauthorizedError();
 		case 404: throw new NotFoundError();
@@ -35,7 +36,7 @@ export const getPatientById = async (id: number): Promise<PatientType> => {
 		case 200: {
 			const response = PatientSchema.safeParse(await res.json());
 			if (response.success) return response.data;
-			throw new ValidationError(response.error.message);
+			throw new APIParseError();
 		}
 		case 401: throw new UnauthorizedError();
 		case 404: throw new NotFoundError();

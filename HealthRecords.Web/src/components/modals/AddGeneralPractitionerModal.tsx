@@ -2,12 +2,12 @@ import { CreateGeneralPractitionerSchema, type CreateGeneralPractitionerType } f
 import { GeneralPractitionerAPI } from '@/api/generalPractitioner';
 import { Button, Stack, TextInput, Title } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
-import { modals } from '@mantine/modals';
+import { ContextModalProps, modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconExclamationCircle } from '@tabler/icons-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-export const AddGeneralPractitionerModal = () => {
+export const AddGeneralPractitionerModal = (props: ContextModalProps) => {
   const queryClient = useQueryClient();
 
   const gpForm = useForm<CreateGeneralPractitionerType>({
@@ -38,7 +38,7 @@ export const AddGeneralPractitionerModal = () => {
         icon: <IconCheck />,
         withBorder: true,
       });
-      modals.close("add-general-practitioner-modal");
+      modals.close(props.id);
     },
     onError: (error) => {
       notifications.show({

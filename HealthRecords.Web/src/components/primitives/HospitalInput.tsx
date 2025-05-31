@@ -1,6 +1,5 @@
 import type { HospitalListType, HospitalType } from "@ctypes/hospital.ts";
 import { HospitalAPI } from "@api/hospital.ts";
-import AddHospitalModal from "@components/modals/AddHospitalModal.tsx";
 import {
 	Button,
 	Combobox,
@@ -10,7 +9,7 @@ import {
 	Text,
 	useCombobox,
 } from "@mantine/core";
-import { modals } from "@mantine/modals";
+import { openContextModal } from "@mantine/modals";
 import { useQuery } from "@tanstack/react-query";
 import { forwardRef, useEffect, useState } from "react";
 
@@ -80,7 +79,7 @@ export const HospitalInput = forwardRef<HTMLInputElement, HospitalInputProps>(
 					onOptionSubmit={(val) => {
 						setSelectedHospital(
 							hospitals.find((hospital) => hospital.id.toString() === val) ??
-								null,
+							null,
 						);
 						combobox.closeDropdown();
 					}}
@@ -92,7 +91,7 @@ export const HospitalInput = forwardRef<HTMLInputElement, HospitalInputProps>(
 							defaultValue={
 								defaultValue !== 0
 									? hospitals.find((hospital) => hospital.id === defaultValue)
-											?.name || undefined
+										?.name || undefined
 									: undefined
 							}
 							onChange={(event) => {
@@ -126,10 +125,11 @@ export const HospitalInput = forwardRef<HTMLInputElement, HospitalInputProps>(
 						fullWidth
 						color="gray"
 						onClick={() =>
-							modals.open({
-								id: "add-hospital-modal",
-								children: <AddHospitalModal />,
-								withCloseButton: false,
+							openContextModal({
+								modal: "add-hospital-modal",
+								innerProps: {
+									withCloseButton: false,
+								},
 							})
 						}
 					>

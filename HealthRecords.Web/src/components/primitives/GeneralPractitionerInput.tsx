@@ -3,7 +3,6 @@ import type {
 	GeneralPractitionerType,
 } from "@/types/generalPractitioner";
 import { GeneralPractitionerAPI } from "@/api/generalPractitioner";
-import AddGeneralPractitionerModal from "@/components/modals/AddGeneralPractitionerModal";
 import {
 	Button,
 	Combobox,
@@ -13,7 +12,7 @@ import {
 	Text,
 	useCombobox,
 } from "@mantine/core";
-import { modals } from "@mantine/modals";
+import { openContextModal } from "@mantine/modals";
 import { useQuery } from "@tanstack/react-query";
 import { forwardRef, useEffect, useState } from "react";
 
@@ -133,10 +132,11 @@ export const GeneralPractitionerInput = forwardRef<
 				fullWidth
 				color="gray"
 				onClick={() =>
-					modals.open({
-						id: "add-general-practitioner-modal",
-						children: <AddGeneralPractitionerModal />,
-						withCloseButton: false,
+					openContextModal({
+						modal: "add-general-practitioner-modal",
+						innerProps: {
+							withCloseButton: false,
+						}
 					})
 				}
 			>

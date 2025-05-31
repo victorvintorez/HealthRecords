@@ -76,3 +76,7 @@ export const AuthRouteParams = z.object({
 export const IndexRouteParams = z.object({
 	fullname: z.string().optional(),
 });
+
+export const PatientRouteParams = z.object({
+	id: z.number(),
+});

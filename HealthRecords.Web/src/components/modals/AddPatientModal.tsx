@@ -2,7 +2,7 @@ import { CreatePatientSchema, type CreatePatientType } from '@/types/patient';
 import { PatientAPI } from '@/api/patient';
 import { Button, Stack, TextInput, Title, NumberInput, Select } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
-import { modals } from '@mantine/modals';
+import { ContextModalProps, modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { DatePickerInput } from '@mantine/dates';
 import { IconCalendar, IconCheck, IconExclamationCircle } from '@tabler/icons-react';
@@ -11,7 +11,7 @@ import { GenderEnum, SexEnum, BloodTypeEnum } from '@/types/enums';
 import { useState } from 'react';
 import { GeneralPractitionerInput } from '@/components/primitives/GeneralPractitionerInput';
 
-export const AddPatientModal = () => {
+export const AddPatientModal = (props: ContextModalProps) => {
   const queryClient = useQueryClient();
   const [gpId, setGpId] = useState<number | undefined>(undefined);
 
@@ -48,7 +48,7 @@ export const AddPatientModal = () => {
         icon: <IconCheck />,
         withBorder: true,
       });
-      modals.close('add-patient-modal');
+      modals.close(props.id);
     },
     onError: (error) => {
       notifications.show({

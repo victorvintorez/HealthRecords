@@ -11,6 +11,7 @@ import {
 	UnauthorizedError,
 	UnexpectedStatusError,
 	ValidationError,
+	APIParseError,
 } from '../errors.ts';
 
 const getHospitalAll = async (): Promise<HospitalListType> => {
@@ -28,7 +29,7 @@ const getHospitalAll = async (): Promise<HospitalListType> => {
 			if (response.success) {
 				return response.data;
 			} else {
-				throw new ValidationError(response.error.message);
+				throw new APIParseError();
 			}
 		}
 		case 401:
@@ -55,7 +56,7 @@ const getHospitalById = async (id: number): Promise<HospitalType> => {
 			if (response.success) {
 				return response.data;
 			} else {
-				throw new ValidationError(response.error.message);
+				throw new APIParseError();
 			}
 		}
 		case 401:

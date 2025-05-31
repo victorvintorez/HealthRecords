@@ -12,17 +12,17 @@ export const PatientSchema = z.object({
 	weight: z.number(),
 	height: z.number(),
 	bloodType: BloodTypeEnum,
-	generalPractitionerId: z.number().optional(),
-	allergyIds: z.array(z.number()).optional(),
-	emergencyContactIds: z.array(z.number()).optional(),
-	prescriptionIds: z.array(z.number()).optional(),
-	healthRecordIds: z.array(z.number()).optional(),
+	generalPractitionerId: z.number().nullable().optional(),
+	allergyIds: z.array(z.number()).nullable().optional(),
+	emergencyContactIds: z.array(z.number()).nullable().optional(),
+	prescriptionIds: z.array(z.number()).nullable().optional(),
+	healthRecordIds: z.array(z.number()).nullable().optional(),
 });
 export type PatientType = z.infer<typeof PatientSchema>;
 
 export const PatientListSchema = z.object({
 	patients: z.array(PatientSchema),
-	cursor: z.number().optional(),
+	cursor: z.number().nullable().optional(),
 });
 export type PatientListType = z.infer<typeof PatientListSchema>;
 

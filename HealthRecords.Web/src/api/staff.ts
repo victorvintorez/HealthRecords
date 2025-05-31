@@ -2,7 +2,7 @@ import {
 	NotFoundError,
 	UnauthorizedError,
 	UnexpectedStatusError,
-	ValidationError,
+	APIParseError,
 } from '../errors.ts';
 import {
 	StaffPageResponseSchema,
@@ -27,7 +27,7 @@ const getStaffSelf = async (): Promise<StaffType> => {
 			if (response.success) {
 				return response.data;
 			} else {
-				throw Error(response.error.message);
+				throw new APIParseError();
 			}
 		}
 		case 401:
@@ -39,8 +39,8 @@ const getStaffSelf = async (): Promise<StaffType> => {
 	}
 };
 
-const getStaffAll = async (page: number): Promise<StaffPageResponseType> => {
-	const res = await fetch(`/api/v1/staff?page=${page}`, {
+const getStaffAll = async (): Promise<StaffPageResponseType> => {
+	const res = await fetch(`/api/v1/staff/all`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',
@@ -54,7 +54,7 @@ const getStaffAll = async (page: number): Promise<StaffPageResponseType> => {
 			if (response.success) {
 				return response.data;
 			} else {
-				throw new ValidationError(response.error.message);
+				throw new APIParseError();
 			}
 		}
 		case 401:
@@ -81,7 +81,7 @@ const getStaffById = async (id: number): Promise<StaffType> => {
 			if (response.success) {
 				return response.data;
 			} else {
-				throw new ValidationError(response.error.message);
+				throw new APIParseError();
 			}
 		}
 		case 401:
@@ -230,8 +230,6 @@ export const StaffAPI = {
 			queryFn: getStaffById,
 			staleTime: Infinity,
 		},
-	},
-	infiniteQuery: {
 		staffAll: {
 			queryKey: ['staff', 'all'],
 			queryFn: getStaffAll,

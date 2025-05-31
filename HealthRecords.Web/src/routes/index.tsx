@@ -8,9 +8,8 @@ import { PatientAPI } from '@/api/patient';
 import { zodValidator } from '@tanstack/zod-adapter';
 import { IndexRouteParams } from '@/types/misc';
 import { ActionIcon, Affix } from '@mantine/core';
-import { IconPlus } from '@tabler/icons-react';
-import { modals } from '@mantine/modals';
-import { AddPatientModal } from '@/components/modals/AddPatientModal';
+import { IconArrowRight, IconPlus } from '@tabler/icons-react';
+import { openContextModal } from '@mantine/modals';
 
 const patientTableColumns: MRT_ColumnDef<PatientType>[] = [
 	{
@@ -19,11 +18,11 @@ const patientTableColumns: MRT_ColumnDef<PatientType>[] = [
 	},
 	{
 		header: 'Date of Birth',
-		accessorKey: 'dateOfBirth',
+		accessorFn: row => new Date(row.dateOfBirth).toDateString(),
 	},
 	{
 		header: 'Gender',
-		accessorKey: 'gender'
+		accessorKey: 'gender',
 	},
 	{
 		header: 'Address',
@@ -39,7 +38,7 @@ const patientTableColumns: MRT_ColumnDef<PatientType>[] = [
 		Cell: ({ cell }) => {
 			const patientId = cell.getValue<number>();
 			return (
-				<CustomLinkButton to="/patient" search={{ id: patientId }} variant='outline' >Go To Patient</CustomLinkButton>
+				<CustomLinkButton to="/patient" search={{ id: patientId }} fullWidth variant='outline' rightSection={<IconArrowRight />} >Go To Patient</CustomLinkButton>
 			);
 		}
 	}
@@ -59,7 +58,12 @@ const Index = () => {
 	})
 
 	const flatPatients = useMemo(
-		() => patients?.pages.flatMap(page => page.patients).filter(patient => patient.fullName.toLowerCase === fullNameSearch?.toLowerCase) ?? [], 
+		() => patients?.pages
+		.flatMap(page => page.patients)
+		.filter(patient => {
+			if (!fullNameSearch) return true;
+			return patient.fullName.toLowerCase().includes(fullNameSearch.toLowerCase());
+		}) ?? [], 
 		[patients, fullNameSearch]
 	);
 
@@ -132,10 +136,11 @@ const Index = () => {
 					variant="filled"
 					size="input-xl"
 					onClick={() =>
-						modals.open({
-							id: 'add-patient-modal',
-							children: <AddPatientModal />,
-							withCloseButton: false,
+						openContextModal({
+							modal: 'add-patient-modal',
+							innerProps: {
+								withCloseButton: false,
+							},
 						})
 					}
 				>

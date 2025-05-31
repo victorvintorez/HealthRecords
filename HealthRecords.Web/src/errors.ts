@@ -19,6 +19,13 @@ export class ValidationError extends Error {
 	}
 }
 
+export class APIParseError extends Error {
+	constructor() {
+		super("Failed to parse API response")
+		this.name = "APIParseError"
+	}
+}
+
 export class UnexpectedStatusError extends Error {
 	constructor(status: number) {
 		super(`Unexpected status: ${status}`)

@@ -25,7 +25,8 @@ public class GeneralPractitionerController(
     public async Task<Results<Ok<List<GeneralPractitionerDto>>, NotFound<string>>> GetGeneralPractitionerAll()
     {
         return TypedResults.Ok(await db.GeneralPractitioners
-            .Select(gp => new GeneralPractitionerDto {
+            .Select(gp => new GeneralPractitionerDto
+            {
                 Id = gp.Id,
                 SurgeryName = gp.SurgeryName,
                 Address = gp.Address,
@@ -42,14 +43,17 @@ public class GeneralPractitionerController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<Results<Ok<GeneralPractitionerDto>, NotFound<string>>> GetGeneralPractitionerById([FromRoute] int id)
+    public async Task<Results<Ok<GeneralPractitionerDto>, NotFound<string>>> GetGeneralPractitionerById(
+        [FromRoute] int id)
     {
         var gp = await db.GeneralPractitioners.FindAsync(id);
         if (gp == null)
         {
             return TypedResults.NotFound($"General practitioner with id {id} not found.");
         }
-        var dto = new GeneralPractitionerDto {
+
+        var dto = new GeneralPractitionerDto
+        {
             Id = gp.Id,
             SurgeryName = gp.SurgeryName,
             Address = gp.Address,
@@ -67,9 +71,11 @@ public class GeneralPractitionerController(
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<Results<Ok<GeneralPractitionerDto>, BadRequest<string>, InternalServerError<string>>> CreateGeneralPractitioner([FromBody] CreateGeneralPractitionerFb body)
+    public async Task<Results<Ok, BadRequest<string>, InternalServerError<string>>>
+        CreateGeneralPractitioner([FromBody] CreateGeneralPractitionerFb body)
     {
-        var gp = new GeneralPractitioner {
+        var gp = new GeneralPractitioner
+        {
             SurgeryName = body.SurgeryName,
             Address = body.Address,
             PhoneNumber = body.PhoneNumber,
@@ -80,15 +86,8 @@ public class GeneralPractitionerController(
         {
             db.GeneralPractitioners.Add(gp);
             await db.SaveChangesAsync();
-            var dto = new GeneralPractitionerDto {
-                Id = gp.Id,
-                SurgeryName = gp.SurgeryName,
-                Address = gp.Address,
-                PhoneNumber = gp.PhoneNumber,
-                Email = gp.Email,
-                Website = gp.Website
-            };
-            return TypedResults.Ok(dto);
+
+            return TypedResults.Ok();
         }
         catch (Exception ex)
         {
@@ -105,14 +104,17 @@ public class GeneralPractitionerController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<Results<Ok<GeneralPractitionerDto>, NotFound<string>, BadRequest<string>, InternalServerError<string>>> UpdateGeneralPractitioner(
-        [FromRoute] int id, [FromBody] UpdateGeneralPractitionerFb body)
+    public async
+        Task<Results<Ok, NotFound<string>, BadRequest<string>, InternalServerError<string>>>
+        UpdateGeneralPractitioner(
+            [FromRoute] int id, [FromBody] UpdateGeneralPractitionerFb body)
     {
         var gp = await db.GeneralPractitioners.FindAsync(id);
         if (gp == null)
         {
             return TypedResults.NotFound($"General practitioner with id {id} not found.");
         }
+
         try
         {
             if (body.SurgeryName != null) gp.SurgeryName = body.SurgeryName;
@@ -121,15 +123,8 @@ public class GeneralPractitionerController(
             if (body.Email != null) gp.Email = body.Email;
             if (body.Website != null) gp.Website = body.Website;
             await db.SaveChangesAsync();
-            var dto = new GeneralPractitionerDto {
-                Id = gp.Id,
-                SurgeryName = gp.SurgeryName,
-                Address = gp.Address,
-                PhoneNumber = gp.PhoneNumber,
-                Email = gp.Email,
-                Website = gp.Website
-            };
-            return TypedResults.Ok(dto);
+
+            return TypedResults.Ok();
         }
         catch (Exception ex)
         {
@@ -145,13 +140,15 @@ public class GeneralPractitionerController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<Results<Ok, NotFound<string>, InternalServerError<string>>> DeleteGeneralPractitionerById([FromRoute] int id)
+    public async Task<Results<Ok, NotFound<string>, InternalServerError<string>>> DeleteGeneralPractitionerById(
+        [FromRoute] int id)
     {
         var gp = await db.GeneralPractitioners.FindAsync(id);
         if (gp == null)
         {
             return TypedResults.NotFound($"General practitioner with id {id} not found.");
         }
+
         try
         {
             db.GeneralPractitioners.Remove(gp);

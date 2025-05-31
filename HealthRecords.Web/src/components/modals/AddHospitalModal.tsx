@@ -2,12 +2,12 @@ import { CreateHospitalSchema, type CreateHospitalType } from '@ctypes/hospital.
 import { HospitalAPI } from '@api/hospital.ts';
 import { Button, Stack, TextInput, Title } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
-import { modals } from '@mantine/modals';
+import { ContextModalProps, modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconExclamationCircle } from '@tabler/icons-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-export const AddHospitalModal = () => {
+export const AddHospitalModal = (props: ContextModalProps) => {
 	const queryClient = useQueryClient();
 
 	const hospitalForm = useForm<CreateHospitalType>({
@@ -36,7 +36,7 @@ export const AddHospitalModal = () => {
 				icon: <IconCheck />,
 				withBorder: true,
 			});
-			modals.close("add-hospital-modal");
+			modals.close(props.id);
 		},
 		onError: (error) => {
 			notifications.show({

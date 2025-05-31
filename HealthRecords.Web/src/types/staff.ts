@@ -15,7 +15,7 @@ export type StaffType = z.infer<typeof StaffSchema>;
 
 export const StaffPageResponseSchema = z.object({
 	staff: z.array(StaffSchema),
-	cursor: z.number().optional(),
+	cursor: z.nullable(z.number()).optional(),
 });
 export type StaffPageResponseType = z.infer<typeof StaffPageResponseSchema>;
 

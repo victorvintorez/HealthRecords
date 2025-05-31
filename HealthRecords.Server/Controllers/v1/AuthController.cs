@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace HealthRecords.Server.Controllers.v1;
 
@@ -23,26 +22,31 @@ public class AuthController(
     UserManager<IdentityUser> userManager,
     IUserStore<IdentityUser> userStore,
     BlobServiceClient blobServiceClient,
-    SignInManager<IdentityUser> signInManager) : ControllerBase {
+    SignInManager<IdentityUser> signInManager) : ControllerBase
+{
     [HttpPost(Name = "register")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<Results<Ok, BadRequest<string>, InternalServerError<string>>> Register(
-        [FromForm] CreateStaffFb body) {
+        [FromForm] CreateStaffFb body)
+    {
         // Check a user isn't already logged in
-        if (!string.IsNullOrEmpty(userManager.GetUserId(User))) {
+        if (!string.IsNullOrEmpty(userManager.GetUserId(User)))
+        {
             return TypedResults.BadRequest("User is already logged in.");
         }
 
         // Check an account with email doesn't already exist
-        if (await userManager.FindByEmailAsync(body.Email) != null) {
+        if (await userManager.FindByEmailAsync(body.Email) != null)
+        {
             return TypedResults.BadRequest("Email is already in use.");
         }
 
         // Create a user account
         var emailAddressAttribute = new EmailAddressAttribute();
-        if (string.IsNullOrEmpty(body.Email) || !emailAddressAttribute.IsValid(body.Email)) {
+        if (string.IsNullOrEmpty(body.Email) || !emailAddressAttribute.IsValid(body.Email))
+        {
             return TypedResults.BadRequest("Email is invalid.");
         }
 
@@ -50,71 +54,82 @@ public class AuthController(
         var user = new IdentityUser();
         await userStore.SetUserNameAsync(user, body.Email, CancellationToken.None);
         await emailStore.SetEmailAsync(user, body.Email, CancellationToken.None);
-        IdentityResult creationResult = await userManager.CreateAsync(user, body.Password);
+        var creationResult = await userManager.CreateAsync(user, body.Password);
 
-        if (!creationResult.Succeeded) {
+        if (!creationResult.Succeeded)
+        {
             return TypedResults.BadRequest(creationResult.Errors.First().Description);
         }
 
         // Log in freshly created user
         signInManager.AuthenticationScheme = IdentityConstants.ApplicationScheme;
 
-        SignInResult loginResult = await signInManager.PasswordSignInAsync(body.Email, body.Password, true, true);
+        var loginResult = await signInManager.PasswordSignInAsync(body.Email, body.Password, true, true);
 
-        if (!loginResult.Succeeded) {
+        if (!loginResult.Succeeded)
+        {
             logger.LogError("Couldn't log in user.");
             return TypedResults.InternalServerError("Couldn't log in user.");
         }
 
         // Retrieve the user's ID
         var userId = userManager.GetUserId(User);
-        if (string.IsNullOrEmpty(userId)) {
+        if (string.IsNullOrEmpty(userId))
+        {
             logger.LogError("Couldn't retrieve user ID.");
             return TypedResults.InternalServerError("Couldn't retrieve user ID.");
         }
 
         // Check if hospital exists
-        Hospital? hospital = await db.Hospitals.FirstOrDefaultAsync(h => h.Id == body.HospitalId);
-        if (hospital == null) {
+        var hospital = await db.Hospitals.FirstOrDefaultAsync(h => h.Id == body.HospitalId);
+        if (hospital == null)
+        {
             return TypedResults.BadRequest("Hospital ID is invalid.");
         }
 
         // Check content type of profile image
-        if (!FileType.IsType(body.ProfileImage.ContentType, FileType.Type.Image)) {
+        if (!FileType.IsType(body.ProfileImage.ContentType, FileType.Type.Image))
+        {
             return TypedResults.BadRequest("Profile image must be an image.");
         }
 
         // Upload the profile image to blob storage
         var filename = $"{userId}_profile-img.{body.ProfileImage.FileName.Split(".").Last()}";
-        BlobClient blobClient = blobServiceClient
+        var blobClient = blobServiceClient
             .GetBlobContainerClient("staff-profile-images").GetBlobClient(filename);
 
-        try {
+        try
+        {
             await blobClient.UploadAsync(body.ProfileImage.OpenReadStream());
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             logger.LogError(ex, "Couldn't upload profile image to blob storage");
             return TypedResults.InternalServerError("Couldn't upload profile image to blob storage.");
         }
 
         // Create the new staff member
-        db.Staff.Add(new Staff {
+        db.Staff.Add(new Staff
+        {
             AccountId = userId,
             FullName = body.FullName,
             Department = body.Department,
             Role = StaffRole.Viewer,
             HospitalId = hospital.Id,
             Hospital = hospital,
-            ProfileImage = new FileBlob {
+            ProfileImage = new FileBlob
+            {
                 FileName = filename,
                 ContentType = body.ProfileImage.ContentType,
                 Container = blobClient.BlobContainerName
             }
         });
-        try {
+        try
+        {
             await db.SaveChangesAsync();
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             logger.LogError(ex, "Couldn't create new staff member record");
             return TypedResults.InternalServerError("Couldn't create new staff member record.");
         }
@@ -126,9 +141,11 @@ public class AuthController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<Results<Ok, BadRequest<string>>>
-        Login([FromBody] LoginFb body) {
+        Login([FromBody] LoginFb body)
+    {
         // Check a user isn't already logged in
-        if (!string.IsNullOrEmpty(userManager.GetUserId(User))) {
+        if (!string.IsNullOrEmpty(userManager.GetUserId(User)))
+        {
             return TypedResults.BadRequest("User is already logged in.");
         }
 
@@ -136,7 +153,8 @@ public class AuthController(
 
         var result = await signInManager.PasswordSignInAsync(body.Email, body.Password, true, true);
 
-        if (!result.Succeeded) {
+        if (!result.Succeeded)
+        {
             return TypedResults.BadRequest("Invalid email or password.");
         }
 
@@ -149,9 +167,11 @@ public class AuthController(
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<Results<Ok, BadRequest<string>, UnauthorizedHttpResult>>
-        Logout([FromBody] object? obj = null) {
+        Logout([FromBody] object? obj = null)
+    {
         // Check a user is logged in
-        if (string.IsNullOrEmpty(userManager.GetUserId(User))) {
+        if (string.IsNullOrEmpty(userManager.GetUserId(User)))
+        {
             return TypedResults.BadRequest("User is not logged in.");
         }
 
@@ -159,18 +179,20 @@ public class AuthController(
         await signInManager.SignOutAsync();
         return TypedResults.Ok();
     }
-    
+
     [HttpGet(Name = "isAdmin")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<Results<Ok<bool>, UnauthorizedHttpResult>> IsAdmin() {
+    public async Task<Results<Ok<bool>, UnauthorizedHttpResult>> IsAdmin()
+    {
         // Check a user is logged in
         var user = await userManager.GetUserAsync(User);
-        if (user == null) {
+        if (user == null)
+        {
             return TypedResults.Unauthorized();
         }
-        
+
         // Check if the user has the administrator role
         var isAdmin = await userManager.IsInRoleAsync(user, "Administrator");
         return TypedResults.Ok(isAdmin);

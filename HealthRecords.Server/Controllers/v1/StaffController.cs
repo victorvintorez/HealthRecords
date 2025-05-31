@@ -76,43 +76,40 @@ public class StaffController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<Results<Ok<StaffPageDto>, NotFound<string>>> GetStaffAll([FromQuery] int page = 0) {
-        const int top = 20;
-        var skip = page >= 1 ? page - 1 : 0;
+    public async Task<Results<Ok<List<StaffDto>>, NotFound<string>, StatusCodeHttpResult>> GetStaffAll() {
+        try {
+            var staffRecords = await db.Staff
+                .Include(s => s.Hospital)
+                .Include(s => s.ProfileImage)
+                .OrderBy(w => w.FullName)
+                .ThenBy(w => w.Id)
+                .ToListAsync();
 
-        var staffRecords = await db.Staff
-            .Include(s => s.Hospital)
-            .Include(s => s.ProfileImage)
-            .OrderBy(w => w.FullName)
-            .ThenBy(w => w.Id)
-            .Skip(skip)
-            .Take(top)
-            .ToListAsync();
-
-        var staffList = new List<StaffDto>();
-        foreach (var s in staffRecords) {
-            string profileImageUrl = string.Empty;
-            if (!string.IsNullOrEmpty(s.ProfileImage.FileName)) {
-                profileImageUrl = await sasTokenService.GetSasUriAsync(
-                    s.AccountId,
-                    s.ProfileImage.Container,
-                    s.ProfileImage.FileName
-                );
+            var staffList = new List<StaffDto>();
+            foreach (var s in staffRecords) {
+                var profileImageUrl = string.Empty;
+                if (!string.IsNullOrEmpty(s.ProfileImage.FileName)) {
+                    profileImageUrl = await sasTokenService.GetSasUriAsync(
+                        s.AccountId,
+                        s.ProfileImage.Container,
+                        s.ProfileImage.FileName
+                    );
+                }
+                staffList.Add(new StaffDto {
+                    Id = s.Id,
+                    FullName = s.FullName,
+                    Department = s.Department,
+                    Role = s.Role.ToString(),
+                    HospitalId = s.HospitalId,
+                    HospitalName = s.Hospital.Name,
+                    ProfileImageUrl = profileImageUrl
+                });
             }
-            staffList.Add(new StaffDto {
-                Id = s.Id,
-                FullName = s.FullName,
-                Department = s.Department,
-                Role = s.Role.ToString(),
-                HospitalId = s.HospitalId,
-                HospitalName = s.Hospital.Name,
-                ProfileImageUrl = profileImageUrl
-            });
+            return TypedResults.Ok(staffList);
+        } catch (Exception ex) {
+            logger.LogError(ex, "An error occurred while getting all staff");
+            return TypedResults.StatusCode(StatusCodes.Status500InternalServerError);
         }
-        return TypedResults.Ok(new StaffPageDto {
-            Staff = staffList,
-            Cursor = staffList.Count == top ? page + 1 : null
-        });
     }
 
     [HttpGet("{id:int}", Name = "GetStaffById")]
@@ -132,7 +129,7 @@ public class StaffController(
             return TypedResults.NotFound("Couldn't find a record with the provided ID.");
         }
 
-        string profileImageUrl = string.Empty;
+        var profileImageUrl = string.Empty;
         if (!string.IsNullOrEmpty(staffRecord.ProfileImage.FileName)) {
             profileImageUrl = await sasTokenService.GetSasUriAsync(
                 staffRecord.AccountId,
@@ -160,17 +157,17 @@ public class StaffController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<Results<RedirectHttpResult, NotFound<string>, BadRequest<string>, InternalServerError<string>>>
+    public async Task<Results<Ok, NotFound<string>, BadRequest<string>, InternalServerError<string>>>
         DeleteStaff() {
         // Get the currently authorized user's ID
-        IdentityUser? user = await userManager.GetUserAsync(User);
+        var user = await userManager.GetUserAsync(User);
         if (user == null) {
             logger.LogError("Couldn't retrieve user ID.");
             return TypedResults.InternalServerError("Couldn't retrieve user ID.");
         }
 
         // Retrieve staff record
-        Staff? staff = await db.Staff.Include(staff => staff.ProfileImage)
+        var staff = await db.Staff.Include(staff => staff.ProfileImage)
             .FirstOrDefaultAsync(s => s.AccountId == user.Id);
 
         // Check if the staff record exists
@@ -179,7 +176,7 @@ public class StaffController(
         }
 
         // Delete profile image from blob storage
-        BlobClient blobClient = blobServiceClient
+        var blobClient = blobServiceClient
             .GetBlobContainerClient("staff-profile-images")
             .GetBlobClient(staff.ProfileImage.FileName);
         await blobClient.DeleteIfExistsAsync();
@@ -192,7 +189,7 @@ public class StaffController(
         await signInManager.SignOutAsync();
         await userManager.DeleteAsync(user);
 
-        return TypedResults.Redirect("/");
+        return TypedResults.Ok();
     }
 
     [HttpDelete("{id:int}", Name = "DeleteStaffById")]
@@ -201,10 +198,10 @@ public class StaffController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<Results<RedirectHttpResult, NotFound<string>, BadRequest<string>, InternalServerError<string>>>
+    public async Task<Results<Ok, NotFound<string>, BadRequest<string>, InternalServerError<string>>>
         DeleteStaffById([FromRoute] int id) {
         // Retrieve staff record
-        Staff? staff = await db.Staff.Include(staff => staff.ProfileImage)
+        var staff = await db.Staff.Include(staff => staff.ProfileImage)
             .FirstOrDefaultAsync(s => s.Id == id);
 
         // Check if the staff record exists
@@ -213,13 +210,13 @@ public class StaffController(
         }
 
         // Check if the staff record has an Identity user account
-        IdentityUser? user = await userManager.FindByIdAsync(staff.AccountId);
+        var user = await userManager.FindByIdAsync(staff.AccountId);
         if (user == null) {
             return TypedResults.BadRequest("Staff record doesn't have an associated Identity user account.");
         }
 
         // Delete profile image from blob storage
-        BlobClient blobClient = blobServiceClient
+        var blobClient = blobServiceClient
             .GetBlobContainerClient("staff-profile-images")
             .GetBlobClient(staff.ProfileImage.FileName);
         await blobClient.DeleteIfExistsAsync();
@@ -232,7 +229,7 @@ public class StaffController(
         await signInManager.SignOutAsync();
         await userManager.DeleteAsync(user);
 
-        return TypedResults.Redirect("/");
+        return TypedResults.Ok();
     }
 
     [HttpPatch]
@@ -244,14 +241,14 @@ public class StaffController(
     public async Task<Results<Ok, NotFound<string>, BadRequest<string>, InternalServerError<string>>> UpdateStaff(
         [FromForm] UpdateStaffFb body) {
         // Get the currently authorized user's ID
-        IdentityUser? user = await userManager.GetUserAsync(User);
+        var user = await userManager.GetUserAsync(User);
         if (user == null) {
             logger.LogError("Couldn't retrieve user ID.");
             return TypedResults.InternalServerError("Couldn't retrieve user ID.");
         }
 
         // Retrieve staff record
-        Staff? staff = await db.Staff.Include(staff => staff.ProfileImage)
+        var staff = await db.Staff.Include(staff => staff.ProfileImage)
             .FirstOrDefaultAsync(s => s.AccountId == user.Id);
 
         // Check if the staff record exists
@@ -280,7 +277,7 @@ public class StaffController(
         }
 
         if (body.HospitalId != null && body.HospitalId != staff.HospitalId) {
-            Hospital? hospital = await db.Hospitals.FirstOrDefaultAsync(h => h.Id == body.HospitalId);
+            var hospital = await db.Hospitals.FirstOrDefaultAsync(h => h.Id == body.HospitalId);
             if (hospital != null) {
                 staff.HospitalId = hospital.Id;
                 staff.Hospital = hospital;
@@ -298,7 +295,7 @@ public class StaffController(
 
             // Upload the profile image to blob storage
             var filename = $"{user.Id}_profile-img.{body.ProfileImage.FileName.Split(".").Last()}";
-            BlobClient blobClient = blobServiceClient
+            var blobClient = blobServiceClient
                 .GetBlobContainerClient("staff-profile-images").GetBlobClient(filename);
 
             try {
@@ -337,7 +334,7 @@ public class StaffController(
     public async Task<Results<Ok, NotFound<string>, BadRequest<string>, InternalServerError<string>>> UpdateStaffById(
         [FromRoute] int id, [FromForm] UpdateStaffFb body) {
         // Retrieve staff record
-        Staff? staff = await db.Staff.Include(staff => staff.ProfileImage)
+        var staff = await db.Staff.Include(staff => staff.ProfileImage)
             .FirstOrDefaultAsync(s => s.Id == id);
 
         // Check if the staff record exists
@@ -346,7 +343,7 @@ public class StaffController(
         }
 
         // Check if the staff record has an Identity user account
-        IdentityUser? user = await userManager.FindByIdAsync(staff.AccountId);
+        var user = await userManager.FindByIdAsync(staff.AccountId);
         if (user == null) {
             return TypedResults.BadRequest("Staff record doesn't have an associated Identity user account.");
         }
@@ -377,7 +374,7 @@ public class StaffController(
         }
 
         if (body.HospitalId != null && body.HospitalId != staff.HospitalId) {
-            Hospital? hospital = await db.Hospitals.FirstOrDefaultAsync(h => h.Id == body.HospitalId);
+            var hospital = await db.Hospitals.FirstOrDefaultAsync(h => h.Id == body.HospitalId);
             if (hospital != null) {
                 staff.HospitalId = hospital.Id;
                 staff.Hospital = hospital;
@@ -395,7 +392,7 @@ public class StaffController(
 
             // Upload the profile image to blob storage
             var filename = $"{user.Id}_profile-img.{body.ProfileImage.FileName.Split(".").Last()}";
-            BlobClient blobClient = blobServiceClient
+            var blobClient = blobServiceClient
                 .GetBlobContainerClient("staff-profile-images").GetBlobClient(filename);
 
             try {
@@ -406,7 +403,7 @@ public class StaffController(
                     Container = blobClient.BlobContainerName
                 };
                 // Delete old profile image from blob storage
-                BlobClient oldBlobClient = blobServiceClient
+                var oldBlobClient = blobServiceClient
                     .GetBlobContainerClient("staff-profile-images")
                     .GetBlobClient(staff.ProfileImage.FileName);
                 await oldBlobClient.DeleteIfExistsAsync();

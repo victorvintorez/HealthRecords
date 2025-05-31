@@ -38,7 +38,7 @@ public class HospitalController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<Results<Ok<HospitalDto>, NotFound<string>>> GetHospitalById([FromRoute] int id) {
-        HospitalDto? hospital = await db.Hospitals
+        var hospital = await db.Hospitals
             .Where(h => h.Id == id)
             .Select(h => new HospitalDto {
                 Id = h.Id,
@@ -96,7 +96,7 @@ public class HospitalController(
     public async Task<Results<RedirectHttpResult, NotFound<string>, BadRequest<string>, InternalServerError<string>>>
         DeleteHospitalById([FromRoute] int id) {
         // Check if hospital exists
-        Hospital? hospital = await db.Hospitals.FirstOrDefaultAsync(h => h.Id == id);
+        var hospital = await db.Hospitals.FirstOrDefaultAsync(h => h.Id == id);
         if (hospital == null) {
             return TypedResults.NotFound("Couldn't find a record with the provided ID.");
         }
@@ -127,7 +127,7 @@ public class HospitalController(
         [FromBody] UpdateHospitalFb body
         ) {
         // Check hospital exists
-        Hospital? hospital = await db.Hospitals.FirstOrDefaultAsync(h => h.Id == id);
+        var hospital = await db.Hospitals.FirstOrDefaultAsync(h => h.Id == id);
         if (hospital == null) {
             return TypedResults.NotFound("Couldn't find a record with the provided ID.");
         }

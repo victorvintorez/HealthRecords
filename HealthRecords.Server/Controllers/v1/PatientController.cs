@@ -56,7 +56,7 @@ public class PatientController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<Results<Ok<PatientDto>, NotFound<string>>> GetPatientById([FromRoute] int id) {
-        PatientDto? patient = await db.Patients
+        var patient = await db.Patients
             .Include(p => p.GeneralPractitioner)
             .Include(p => p.Allergies)
             .Include(p => p.EmergencyContacts)
@@ -134,7 +134,7 @@ public class PatientController(
         }
         
         // Check if General Practitioner exists
-        GeneralPractitioner? gp = await db.GeneralPractitioners.FirstOrDefaultAsync(gp => gp.Id == body.GeneralPractitionerId);
+        var gp = await db.GeneralPractitioners.FirstOrDefaultAsync(gp => gp.Id == body.GeneralPractitionerId);
         if (gp == null) {
             return TypedResults.BadRequest("General Practitioner ID is invalid.");
         }
@@ -172,7 +172,7 @@ public class PatientController(
     public async Task<Results<Ok, NotFound<string>, BadRequest<string>, InternalServerError<string>>>
         DeletePatientById([FromRoute] int id) {
         // Check if the patient exists
-        Patient? patient = await db.Patients.FirstOrDefaultAsync(p => p.Id == id);
+        var patient = await db.Patients.FirstOrDefaultAsync(p => p.Id == id);
         if (patient == null) {
             return TypedResults.NotFound("Couldn't find a record with the provided ID.");
         }
@@ -200,7 +200,7 @@ public class PatientController(
     public async Task<Results<Ok, NotFound<string>, BadRequest<string>, InternalServerError<string>>> UpdatePatientById(
         [FromRoute] int id, [FromBody] UpdatePatientFb body) {
         // Check if the patient exists
-        Patient? patient = await db.Patients.Include(p => p.GeneralPractitioner).FirstOrDefaultAsync(p => p.Id == id);
+        var patient = await db.Patients.Include(p => p.GeneralPractitioner).FirstOrDefaultAsync(p => p.Id == id);
         if (patient == null) {
             return TypedResults.NotFound("Couldn't find a record with the provided ID.");
         }
@@ -276,7 +276,7 @@ public class PatientController(
         
         // Check if a general practitioner exists
         if (body.GeneralPractitionerId != null && body.GeneralPractitionerId != patient.GeneralPractitioner.Id) {
-            GeneralPractitioner? gp = await db.GeneralPractitioners.FirstOrDefaultAsync(gp => gp.Id == body.GeneralPractitionerId);
+            var gp = await db.GeneralPractitioners.FirstOrDefaultAsync(gp => gp.Id == body.GeneralPractitionerId);
             if (gp == null) {
                 return TypedResults.BadRequest("General Practitioner ID is invalid.");
             }

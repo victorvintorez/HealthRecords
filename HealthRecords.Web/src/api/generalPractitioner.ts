@@ -9,6 +9,7 @@ import {
 	UnauthorizedError,
 	UnexpectedStatusError,
 	ValidationError,
+	APIParseError,
 } from '../errors';
 
 export const getGeneralPractitionerAll = async (): Promise<GeneralPractitionerType[]> => {
@@ -21,7 +22,7 @@ export const getGeneralPractitionerAll = async (): Promise<GeneralPractitionerTy
 		case 200: {
 			const response = GeneralPractitionerListSchema.safeParse(await res.json());
 			if (response.success) return response.data;
-			throw new ValidationError(response.error.message);
+			throw new APIParseError();
 		}
 		case 401: throw new UnauthorizedError();
 		case 404: throw new NotFoundError();
@@ -39,7 +40,7 @@ export const getGeneralPractitionerById = async (id: number): Promise<GeneralPra
 		case 200: {
 			const response = GeneralPractitionerSchema.safeParse(await res.json());
 			if (response.success) return response.data;
-			throw new ValidationError(response.error.message);
+			throw new APIParseError();
 		}
 		case 401: throw new UnauthorizedError();
 		case 404: throw new NotFoundError();

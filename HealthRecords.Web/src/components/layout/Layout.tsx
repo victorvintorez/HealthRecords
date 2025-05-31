@@ -10,6 +10,21 @@ import {ModalsProvider} from "@mantine/modals";
 import Header from "./Header.tsx";
 import MainContent from "./MainContent.tsx";
 import Navigation from "./Navigation.tsx";
+import AddGeneralPractitionerModal from '../modals/AddGeneralPractitionerModal.tsx';
+import AddHospitalModal from '../modals/AddHospitalModal.tsx';
+import AddPatientModal from '../modals/AddPatientModal.tsx';
+
+const modals = {
+	"add-general-pracitioner-modal": AddGeneralPractitionerModal,
+	"add-hospital-modal": AddHospitalModal,
+	"add-patient-modal": AddPatientModal,
+}
+
+declare module '@mantine/modals' {
+	export interface MantineModalsOverride {
+		modals: typeof modals;
+	}
+}
 
 const Layout: FC<PropsWithChildren> = ({ children }) => {
 	const [navbarOpened, {toggle: toggleNavbar}] = useDisclosure(false);
@@ -17,7 +32,7 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
 	return (
 		<MantineProvider defaultColorScheme="auto">
 			<Notifications/>
-			<ModalsProvider>
+			<ModalsProvider modals={modals}>
 				<AppShell withBorder header={{ height: 80 }} navbar={{ width: 300, breakpoint: "md", collapsed: { desktop: false, mobile: !navbarOpened }}}>
 					<Header navbarOpened={navbarOpened} toggleNavbar={toggleNavbar}/>
 					<Navigation/>
