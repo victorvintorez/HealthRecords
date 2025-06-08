@@ -50,11 +50,12 @@
 	<Target Name="BuildAndPublishWeb" BeforeTargets="Publish">
 		<Exec Command="npm run build" WorkingDirectory="../HealthRecords.Web" />
 		<RemoveDir Directories="$(PublishDir)wwwroot" />
+		<RemoveDir Directories="$(PublishDir)Assets" />
 		<ItemGroup>
 			<ClientBuildFiles Include="..\HealthRecords.Web\dist\**\*.*" />
 			<AssetFiles Include="Assets\*.*" />
 		</ItemGroup>
 		<Copy SourceFiles="@(ClientBuildFiles)" DestinationFolder="$(PublishDir)wwwroot/" />
-		<Copy SourceFiles="@(AssetFiles)" DestinationFolder="$(PublishDir)wwwroot/Assets/" />
+		<Copy SourceFiles="@(AssetFiles)" DestinationFolder="$(PublishDir)Assets/" />
 	</Target>
 </Project>

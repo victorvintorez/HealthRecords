@@ -55,21 +55,13 @@ builder.Services.AddIdentityCore<IdentityUser>()
     .AddClaimsPrincipalFactory<UserClaimsPrincipalFactory<IdentityUser, IdentityRole>>()
     .AddSignInManager<SignInManager<IdentityUser>>()
     .AddEntityFrameworkStores<HealthRecordsDbContext>();
-builder.Services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme).Configure<ITicketStore>((opts, store) => {
+builder.Services.AddOptions<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme).Configure<ITicketStore>((opts, store) => {
     opts.SessionStore = store;
     opts.Events.OnRedirectToLogin = context => {
         context.Response.StatusCode = 401;
         return Task.CompletedTask;
     };
     opts.Events.OnRedirectToAccessDenied = context => {
-        context.Response.StatusCode = 403;
-        return Task.CompletedTask;
-    };
-    opts.Events.OnRedirectToLogout = context => {
-        context.Response.StatusCode = 401;
-        return Task.CompletedTask;
-    };
-    opts.Events.OnRedirectToReturnUrl = context => {
         context.Response.StatusCode = 401;
         return Task.CompletedTask;
     };

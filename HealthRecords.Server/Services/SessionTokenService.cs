@@ -11,7 +11,7 @@ public class SessionTokenService(IDistributedCache cache) : ITicketStore
     public async Task<string> StoreAsync(AuthenticationTicket ticket)
     {
         var key = CacheKeyPrefix + Guid.NewGuid().ToString("N");
-        await RenewAsync(CacheKeyPrefix + Guid.NewGuid(), ticket);
+        await RenewAsync(key, ticket);
         return key;
     }
 
