@@ -48,11 +48,11 @@
 
 ### Automatic (Linux only)
 ```sh
-curl
+curl -L https://raw.githubusercontent.com/victorvintorez/HealthRecords/master/healthrecords.sh | sh
 ```
 OR (requires wget)
 ```sh
-wget
+wget https://raw.githubusercontent.com/victorvintorez/HealthRecords/master/healthrecords.sh | sh
 ```
 
 ### Manual (Windows w/ Git Bash/Fish, Mac, Linux)
