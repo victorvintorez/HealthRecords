@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using Azure.Storage.Blobs;
 using HealthRecords.Server.Database;
 using HealthRecords.Server.Models.Database;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
+using Microsoft.Extensions.FileProviders;
 using NReco.Logging.File;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -167,7 +169,8 @@ await using (AsyncServiceScope scope = app.Services.CreateAsyncScope()) {
             .GetBlobContainerClient("staff-profile-images").GetBlobClient(filename);
 
         try {
-            await blobClient.UploadAsync(File.OpenRead("Assets/admin-profile-img.png"));
+            await blobClient.UploadAsync(new EmbeddedFileProvider(Assembly.GetAssembly(typeof(Program))!)
+                .GetFileInfo("Assets/admin-profile-img.png").PhysicalPath);
         }
         catch (Exception e) {
             throw new Exception($"Couldn't upload administrator profile image to blob storage.\n{e.Message}");
