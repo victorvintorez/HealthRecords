@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using Azure.Storage.Blobs;
 using HealthRecords.Server.Database;
 using HealthRecords.Server.Models.Database;
@@ -171,7 +172,7 @@ await using (AsyncServiceScope scope = app.Services.CreateAsyncScope()) {
             .GetBlobContainerClient("staff-profile-images").GetBlobClient(filename);
 
         try {
-            await blobClient.UploadAsync(File.OpenRead(Path.Join("Assets", "admin-profile-img.png")));
+            await blobClient.UploadAsync(File.OpenRead(Path.Join(Directory.GetCurrentDirectory(), "Assets", "admin-profile-img.png")));
         }
         catch (Exception e) {
             throw new Exception($"Couldn't upload administrator profile image to blob storage.\n{e.Message}");
