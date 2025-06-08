@@ -53,6 +53,6 @@
 		<ItemGroup>
 			<ClientBuildFiles Include="..\HealthRecords.Web\dist\**\*.*" />
 		</ItemGroup>
-		<Copy SourceFiles="@(ClientBuildFiles)" DestinationFolder="@(ClientBuildFiles->'$(PublishDir)wwwroot/%(RecursiveDir)%(Filename)%(Extension)')" />
+		<Copy SourceFiles="@(ClientBuildFiles)" DestinationFolder="$(PublishDir)wwwroot/" />
 	</Target>
 </Project>
