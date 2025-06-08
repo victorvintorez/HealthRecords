@@ -43,12 +43,12 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
       '@assets': resolve(__dirname, 'src/assets'),
       '@components': resolve(__dirname, 'src/components'),
       '@ctypes': resolve(__dirname, 'src/types'),
       '@api': resolve(__dirname, 'src/api'),
-      '@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs'
+      '@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',
+      '@': resolve(__dirname, 'src'),
     }
   }
 })
