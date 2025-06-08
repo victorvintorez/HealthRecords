@@ -26,7 +26,11 @@ if (builder.Environment.IsDevelopment()) {
 
 // Setup Database (Required for Authentication)
 builder.Services.AddDbContext<HealthRecordsDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("SqlConnection"),
+        sqlOptions => sqlOptions.EnableRetryOnFailure()
+    )
+);
 
 // Setup Cache (Required for SAS Token Service)
 builder.Services.AddStackExchangeRedisCache(options => {
