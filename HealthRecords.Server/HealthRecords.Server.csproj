@@ -55,7 +55,7 @@
 			<ClientBuildFiles Include="..\HealthRecords.Web\dist\**\*.*" />
 			<AssetFiles Include="Assets\*.*" />
 		</ItemGroup>
-		<Copy SourceFiles="@(ClientBuildFiles)" DestinationFolder="$(PublishDir)wwwroot/" />
+		<Copy SourceFiles="@(ClientBuildFiles)" DestinationFiles="@(ClientBuildFiles -> '$(PublishDir)wwwroot/%(RecursiveDir)%(Filename)%(Extension)')" />
 		<Copy SourceFiles="@(AssetFiles)" DestinationFolder="$(PublishDir)Assets/" />
 	</Target>
 </Project>
