@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Reflection;
 using Azure.Storage.Blobs;
 using HealthRecords.Server.Database;
 using HealthRecords.Server.Models.Database;
