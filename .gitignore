@@ -1,7 +1,7 @@
 HealthRecords.Server/bin/
 HealthRecords.Server/obj/
 HealthRecords.Server/Logs/
-HealthRecords.Server/appsettings.*
+HealthRecords.Server/appsettings.*.json
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
