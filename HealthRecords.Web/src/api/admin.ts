@@ -193,4 +193,11 @@ export const AdminAPI = {
 			invalidates: ['patient', 'all'],
 		},
 	},
+	query: {
+		getAdminCounts: {
+			queryKey: ['admin', 'counts'],
+			queryFn: getAdminCounts,
+			staleTime: 1000 * 60 * 5, // 5 minutes
+		},
+	},
 };

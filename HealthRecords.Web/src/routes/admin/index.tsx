@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { Button, NumberInput, Stack, Title, Group, Loader, Center, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { AdminAPI, getAdminCounts } from '@api/admin';
+import { AdminAPI } from '@api/admin';
 import type { AdminCountType } from '@ctypes/admin';
 import GenCount from '@components/primitives/GenCount'; 
 import { type MRT_ColumnDef, useMantineReactTable, MantineReactTable } from 'mantine-react-table';
@@ -19,8 +19,9 @@ const AdminIndexRoute = () => {
   const [hospitalCount, setHospitalCount] = useState(1);
 
   const { data: counts = [], isLoading, isError, refetch, error, isFetching } = useQuery({
-    queryKey: ['admin', 'counts'],
-    queryFn: getAdminCounts,
+    queryKey: AdminAPI.query.getAdminCounts.queryKey,
+    queryFn: AdminAPI.query.getAdminCounts.queryFn,
+    staleTime: AdminAPI.query.getAdminCounts.staleTime,
     refetchOnWindowFocus: false,
   });
 
