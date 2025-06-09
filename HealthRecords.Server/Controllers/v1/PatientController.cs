@@ -29,7 +29,7 @@ public class PatientController(
         var patients = await db.Patients
             .OrderBy(p => p.FullName)
             .ThenBy(p => p.Id)
-            .Skip(skip)
+            .Skip(skip * top)
             .Take(top)
             .Select(p => new PatientDto {
                 Id = p.Id,

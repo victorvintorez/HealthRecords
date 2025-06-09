@@ -12,6 +12,8 @@
 	<ItemGroup>
 		<PackageReference Include="Azure.Identity" Version="1.13.2" />
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
+		<PackageReference Include="Bogus" Version="35.6.3" />
+		<PackageReference Include="CountryData.Bogus" Version="6.13.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.4" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
 		<PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="9.0.4" />
@@ -24,6 +26,7 @@
 		<PackageReference Include="Microsoft.Extensions.Azure" Version="1.11.0" />
 		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.5" />
 		<PackageReference Include="NReco.Logging.File" Version="1.2.2" />
+		<PackageReference Include="WaffleGenerator.Bogus" Version="4.2.2" />
 	</ItemGroup>
 
 	<ItemGroup>

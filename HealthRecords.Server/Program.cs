@@ -67,6 +67,9 @@ builder.Services.AddOptions<CookieAuthenticationOptions>(IdentityConstants.Appli
     };
 });
 
+// Register FakeGenerator as a scoped service
+builder.Services.AddScoped<FakeGenerator>();
+
 // Setup Controllers
 builder.Services.AddControllers();
 
