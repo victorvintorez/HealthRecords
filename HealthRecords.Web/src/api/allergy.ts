@@ -137,16 +137,14 @@ export const AllergyAPI = {
 			mutationKey: ['addAllergy'],
 			mutationFn: addAllergy,
 			invalidates: (patientId: number) => [
-				['allergy', { patientId: patientId.toString() }],
-				['allergy', 'all'],
+				['allergy', { patientId: patientId.toString() }, 'all'],
 			],
 		},
 		deleteAllergy: {
 			mutationKey: ['deleteAllergy'],
 			mutationFn: deleteAllergy,
 			invalidates: (patientId: number) => [
-				['allergy', { patientId: patientId.toString() }],
-				['allergy', 'all'],
+				['allergy', { patientId: patientId.toString() }, 'all'],
 			],
 		},
 		updateAllergy: {
@@ -154,14 +152,12 @@ export const AllergyAPI = {
 			mutationFn: updateAllergy,
 			invalidates: (patientId: number, allergyId: number) => [
 				['allergy', { patientId: patientId.toString(), allergyId: allergyId.toString() }],
-				['allergy', { patientId: patientId.toString() }],
-				['allergy', 'all'],
 			],
 		},
 	},
 	query: {
 		allergies: {
-			queryKey: (patientId: number) => ['allergy', { patientId: patientId.toString() }],
+			queryKey: (patientId: number) => ['allergy', { patientId: patientId.toString() }, 'all'],
 			queryFn: getAllergies,
 			staleTime: 1000 * 60 * 60 * 6, // 6 hours
 		},

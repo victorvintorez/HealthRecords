@@ -27,6 +27,7 @@ public class PatientController(
         var skip = page >= 1 ? page - 1 : 0;
 
         var patients = await db.Patients
+            .Include(p => p.GeneralPractitioner)
             .OrderBy(p => p.FullName)
             .ThenBy(p => p.Id)
             .Skip(skip * top)
@@ -41,7 +42,8 @@ public class PatientController(
                 Sex = p.Sex.ToString(),
                 Weight = p.Weight,
                 Height = p.Height,
-                BloodType = p.BloodType.ToString()
+                BloodType = p.BloodType.ToString(),
+                GeneralPractitionerId = p.GeneralPractitioner.Id,
             }).ToListAsync();
             
         return TypedResults.Ok(new PatientPageDto {

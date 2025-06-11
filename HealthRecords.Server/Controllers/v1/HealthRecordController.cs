@@ -42,6 +42,7 @@ public class HealthRecordController(
                 .Include(hr => hr.AttendingDoctor)
                 .Include(hr => hr.Files)
                 .Where(hr => hr.PatientId == patientId)
+                .OrderByDescending(hr => hr.Date)
                 .ToListAsync();
             var healthRecordDtos = new List<HealthRecordDto>();
             foreach (var hr in healthRecords)

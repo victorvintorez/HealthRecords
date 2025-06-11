@@ -143,8 +143,7 @@ export const EmergencyContactAPI = {
 			mutationKey: ['createEmergencyContact'],
 			mutationFn: createEmergencyContact,
 			invalidates: (patientId: number) => [
-				['emergencyContact', { patientId: patientId.toString() }],
-				['emergencyContact', 'all'],
+				['emergencyContact', { patientId: patientId.toString() }, 'all'],
 			],
 		},
 		updateEmergencyContact: {
@@ -152,22 +151,19 @@ export const EmergencyContactAPI = {
 			mutationFn: updateEmergencyContact,
 			invalidates: (patientId: number, id: number) => [
 				['emergencyContact', { patientId: patientId.toString(), id: id.toString() }],
-				['emergencyContact', { patientId: patientId.toString() }],
-				['emergencyContact', 'all'],
 			],
 		},
 		deleteEmergencyContact: {
 			mutationKey: ['deleteEmergencyContact'],
 			mutationFn: deleteEmergencyContact,
 			invalidates: (patientId: number) => [
-				['emergencyContact', { patientId: patientId.toString() }],
-				['emergencyContact', 'all'],
+				['emergencyContact', { patientId: patientId.toString() }, 'all'],
 			],
 		},
 	},
 	query: {
 		emergencyContacts: {
-			queryKey: (patientId: number) => ['emergencyContact', { patientId: patientId.toString() }],
+			queryKey: (patientId: number) => ['emergencyContact', { patientId: patientId.toString() }, 'all'],
 			queryFn: getEmergencyContacts,
 			staleTime: 1000 * 60 * 60 * 6, // 6 hours
 		},

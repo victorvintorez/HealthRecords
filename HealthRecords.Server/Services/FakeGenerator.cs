@@ -241,8 +241,8 @@ public class FakeGenerator(HealthRecordsDbContext db) {
         var faker = new Faker<CreateHealthRecordFb>()
             .RuleFor(x => x.Date, f => f.Date.Past(5).ToUniversalTime().ToString(CultureInfo.InvariantCulture))
             .RuleFor(x => x.Reason, f => f.PickRandom<IntakeReason>().ToString())
-            .RuleFor(x => x.Complaint, f => f.Lorem.Sentence(5))
-            .RuleFor(x => x.Notes, f => f.Lorem.Paragraph())
+            .RuleFor(x => x.Complaint, f => f.WaffleText(includeHeading: false))
+            .RuleFor(x => x.Notes, f => f.WaffleText(2, false))
             .RuleFor(x => x.Diagnosis, f => f.Lorem.Sentence().OrNull(f))
             .RuleFor(x => x.HospitalId, f => f.PickRandom(hospitalIds)) // Assuming hospital IDs are between 1 and 100
             .RuleFor(x => x.AttendingDoctorId, f => f.PickRandom(doctorIds)); // Assuming doctor IDs are between 1 and 100

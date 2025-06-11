@@ -12,7 +12,7 @@ export const PatientSchema = z.object({
 	weight: z.number(),
 	height: z.number(),
 	bloodType: BloodTypeEnum,
-	generalPractitionerId: z.number().nullable().optional(),
+	generalPractitionerId: z.number(),
 	allergyIds: z.array(z.number()).nullable().optional(),
 	emergencyContactIds: z.array(z.number()).nullable().optional(),
 	prescriptionIds: z.array(z.number()).nullable().optional(),

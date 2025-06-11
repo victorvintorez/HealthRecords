@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { FileSchema } from './misc';
+import { FileSchema, FileType } from './misc';
 
 export const HealthRecordSchema = z.object({
 	id: z.number(),
@@ -26,7 +26,7 @@ export const CreateHealthRecordSchema = z.object({
 	diagnosis: z.string().optional(),
 	hospitalId: z.number(),
 	attendingDoctorId: z.number(),
-	files: FileSchema,
+	files: z.array(FileSchema),
 });
 export type CreateHealthRecordType = z.infer<typeof CreateHealthRecordSchema>;
 
@@ -38,6 +38,6 @@ export const UpdateHealthRecordSchema = z.object({
 	diagnosis: z.string().optional(),
 	hospitalId: z.number().optional(),
 	attendingDoctorId: z.number().optional(),
-	files: FileSchema.optional(),
+	files: z.array(FileSchema).optional(),
 });
 export type UpdateHealthRecordType = z.infer<typeof UpdateHealthRecordSchema>;

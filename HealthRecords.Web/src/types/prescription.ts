@@ -1,15 +1,16 @@
 import { z } from 'zod';
+import { DosageUnitEnum, DurationUnitEnum, FrequencyUnitEnum } from './enums';
 
 export const PrescriptionSchema = z.object({
 	id: z.number(),
 	name: z.string(),
 	dosage: z.number(),
-	dosageUnit: z.string(),
-	dosagePerKilogram: z.number().nullable(),
+	dosageUnit: DosageUnitEnum,
+	dosagePerKilogram: z.boolean(),
 	frequency: z.number(),
-	frequencyUnit: z.string(),
+	frequencyUnit: FrequencyUnitEnum,
 	duration: z.number(),
-	durationUnit: z.string(),
+	durationUnit: DurationUnitEnum,
 	patientId: z.number(),
 });
 export type PrescriptionType = z.infer<typeof PrescriptionSchema>;
@@ -20,23 +21,23 @@ export type PrescriptionListType = z.infer<typeof PrescriptionListSchema>;
 export const CreatePrescriptionSchema = z.object({
 	name: z.string(),
 	dosage: z.number(),
-	dosageUnit: z.string(),
-	dosagePerKilogram: z.number().nullable().optional(),
+	dosageUnit: DosageUnitEnum,
+	dosagePerKilogram: z.boolean(),
 	frequency: z.number(),
-	frequencyUnit: z.string(),
+	frequencyUnit: FrequencyUnitEnum,
 	duration: z.number(),
-	durationUnit: z.string(),
+	durationUnit: DurationUnitEnum,
 });
 export type CreatePrescriptionType = z.infer<typeof CreatePrescriptionSchema>;
 
 export const UpdatePrescriptionSchema = z.object({
 	name: z.string().optional(),
 	dosage: z.number().optional(),
-	dosageUnit: z.string().optional(),
-	dosagePerKilogram: z.number().nullable().optional(),
+	dosageUnit: DosageUnitEnum.optional(),
+	dosagePerKilogram: z.boolean().optional(),
 	frequency: z.number().optional(),
-	frequencyUnit: z.string().optional(),
+	frequencyUnit: FrequencyUnitEnum.optional(),
 	duration: z.number().optional(),
-	durationUnit: z.string().optional(),
+	durationUnit: DurationUnitEnum.optional(),
 });
 export type UpdatePrescriptionType = z.infer<typeof UpdatePrescriptionSchema>;

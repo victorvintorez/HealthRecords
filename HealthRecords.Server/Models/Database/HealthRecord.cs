@@ -9,11 +9,11 @@ public class HealthRecord {
     public int Id { get; set; }
     public required DateTime Date { get; set; }
     public required IntakeReason Reason { get; set; }
-    [StringLength(255)]
+    [StringLength(1024)]
     public required string Complaint { get; set; }
-    [StringLength(255)]   
+    [StringLength(2048)]   
     public required string Notes { get; set; }
-    [StringLength(255)]  
+    [StringLength(1024)]  
     public string? Diagnosis { get; set; }
     
     // Relationships

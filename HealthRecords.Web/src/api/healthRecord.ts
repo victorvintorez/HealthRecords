@@ -162,8 +162,7 @@ export const HealthRecordAPI = {
 			mutationKey: ['createHealthRecord'],
 			mutationFn: createHealthRecord,
 			invalidates: (patientId: number) => [
-				['healthRecord', { patientId: patientId.toString() }],
-				['healthRecord', 'all'],
+				['healthRecord', { patientId: patientId.toString() }, 'all'],
 			],
 		},
 		updateHealthRecord: {
@@ -171,22 +170,19 @@ export const HealthRecordAPI = {
 			mutationFn: updateHealthRecord,
 			invalidates: (patientId: number, healthRecordId: number) => [
 				['healthRecord', { patientId: patientId.toString(), healthRecordId: healthRecordId.toString() }],
-				['healthRecord', { patientId: patientId.toString() }],
-				['healthRecord', 'all'],
 			],
 		},
 		deleteHealthRecord: {
 			mutationKey: ['deleteHealthRecord'],
 			mutationFn: deleteHealthRecord,
 			invalidates: (patientId: number) => [
-				['healthRecord', { patientId: patientId.toString() }],
-				['healthRecord', 'all'],
+				['healthRecord', { patientId: patientId.toString() }, 'all'],
 			],
 		},
 	},
 	query: {
 		healthRecords: {
-			queryKey: (patientId: number) => ['healthRecord', { patientId: patientId.toString() }],
+			queryKey: (patientId: number) => ['healthRecord', { patientId: patientId.toString() }, 'all'],
 			queryFn: getHealthRecords,
 			staleTime: 1000 * 60 * 60 * 6, // 6 hours
 		},

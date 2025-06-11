@@ -13,11 +13,19 @@ import Navigation from "./Navigation.tsx";
 import AddGeneralPractitionerModal from '../modals/AddGeneralPractitionerModal.tsx';
 import AddHospitalModal from '../modals/AddHospitalModal.tsx';
 import AddPatientModal from '../modals/AddPatientModal.tsx';
+import AddAllergyModal from '@components/modals/AddAllergyModal.tsx';
+import AddEmergencyContactModal from '@components/modals/AddEmergencyContactModal.tsx';
+import AddPrescriptionModal from '@components/modals/AddPrescriptionModal.tsx';
+import AddHealthRecordModal from '../modals/AddHealthRecordModal.tsx';
 
 const modals = {
 	"add-general-pracitioner-modal": AddGeneralPractitionerModal,
 	"add-hospital-modal": AddHospitalModal,
 	"add-patient-modal": AddPatientModal,
+	"add-allergy-modal": AddAllergyModal,
+	"add-emergency-contact-modal": AddEmergencyContactModal,
+	"add-prescription-modal": AddPrescriptionModal,
+	"add-health-record-modal": AddHealthRecordModal,
 }
 
 declare module '@mantine/modals' {

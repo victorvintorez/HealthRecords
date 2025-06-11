@@ -26,6 +26,13 @@ export class APIParseError extends Error {
 	}
 }
 
+export class UnexpectedServerError extends Error {
+	constructor(message: string) {
+		super(`Unexpected server error: ${message}`)
+		this.name = "UnexpectedServerError"
+	}
+}
+
 export class UnexpectedStatusError extends Error {
 	constructor(status: number) {
 		super(`Unexpected status: ${status}`)

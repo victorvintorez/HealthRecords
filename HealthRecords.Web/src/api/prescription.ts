@@ -137,8 +137,7 @@ export const PrescriptionAPI = {
 			mutationKey: ['createPrescription'],
 			mutationFn: createPrescription,
 			invalidates: (patientId: number) => [
-				['prescription', { patientId: patientId.toString() }],
-				['prescription', 'all'],
+				['prescription', { patientId: patientId.toString() }, 'all'],
 			],
 		},
 		updatePrescription: {
@@ -146,22 +145,19 @@ export const PrescriptionAPI = {
 			mutationFn: updatePrescription,
 			invalidates: (patientId: number, prescriptionId: number) => [
 				['prescription', { patientId: patientId.toString(), prescriptionId: prescriptionId.toString() }],
-				['prescription', { patientId: patientId.toString() }],
-				['prescription', 'all'],
 			],
 		},
 		deletePrescription: {
 			mutationKey: ['deletePrescription'],
 			mutationFn: deletePrescription,
 			invalidates: (patientId: number) => [
-				['prescription', { patientId: patientId.toString() }],
-				['prescription', 'all'],
+				['prescription', { patientId: patientId.toString() }, 'all'],
 			],
 		},
 	},
 	query: {
 		prescriptions: {
-			queryKey: (patientId: number) => ['prescription', { patientId: patientId.toString() }],
+			queryKey: (patientId: number) => ['prescription', { patientId: patientId.toString() }, 'all'],
 			queryFn: getPrescriptions,
 			staleTime: 1000 * 60 * 60 * 6, // 6 hours
 		},

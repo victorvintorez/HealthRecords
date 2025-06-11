@@ -14,14 +14,9 @@ import {
 	UnauthorizedError,
 	UnexpectedStatusError,
 	APIParseError,
+	UnexpectedServerError,
 } from '../errors';
 import { AdminCountsType, AdminCountsSchema } from '../types/admin';
-
-const parseFakeResult = (data: unknown): FakeResultType => {
-	const parsed = FakeResultSchema.safeParse(data);
-	if (parsed.success) return parsed.data;
-	throw new APIParseError();
-};
 
 export const generatePatients = async (input: GeneratePatientsInputType): Promise<FakeResultType> => {
 	const res = await fetch(`/api/v1/Admin/generate/patients?count=${input.count}`, {
@@ -30,7 +25,12 @@ export const generatePatients = async (input: GeneratePatientsInputType): Promis
 		credentials: 'include',
 	});
 	switch (res.status) {
-		case 200: return parseFakeResult(await res.json());
+		case 200: {
+			const data = await res.json();
+			const parsed = FakeResultSchema.safeParse(data);
+			if (parsed.success && parsed.data.success) return parsed.data;
+			throw new UnexpectedServerError(parsed.error?.message || parsed.data?.message || 'Invalid response');
+		}
 		case 401: throw new UnauthorizedError();
 		case 404: throw new NotFoundError();
 		default: throw new UnexpectedStatusError(res.status);
@@ -44,7 +44,12 @@ export const generateGeneralPractitioners = async (input: GenerateGeneralPractit
 		credentials: 'include',
 	});
 	switch (res.status) {
-		case 200: return parseFakeResult(await res.json());
+		case 200: {
+			const data = await res.json();
+			const parsed = FakeResultSchema.safeParse(data);
+			if (parsed.success && parsed.data.success) return parsed.data;
+			throw new UnexpectedServerError(parsed.error?.message || parsed.data?.message || 'Invalid response');
+		}
 		case 401: throw new UnauthorizedError();
 		case 404: throw new NotFoundError();
 		default: throw new UnexpectedStatusError(res.status);
@@ -58,7 +63,12 @@ export const generateAllergies = async (input: GenerateAllergiesInputType): Prom
 		credentials: 'include',
 	});
 	switch (res.status) {
-		case 200: return parseFakeResult(await res.json());
+		case 200: {
+			const data = await res.json();
+			const parsed = FakeResultSchema.safeParse(data);
+			if (parsed.success && parsed.data.success) return parsed.data;
+			throw new UnexpectedServerError(parsed.error?.message || parsed.data?.message || 'Invalid response');
+		}
 		case 401: throw new UnauthorizedError();
 		case 404: throw new NotFoundError();
 		default: throw new UnexpectedStatusError(res.status);
@@ -72,7 +82,12 @@ export const generateEmergencyContacts = async (input: GenerateEmergencyContacts
 		credentials: 'include',
 	});
 	switch (res.status) {
-		case 200: return parseFakeResult(await res.json());
+		case 200: {
+			const data = await res.json();
+			const parsed = FakeResultSchema.safeParse(data);
+			if (parsed.success && parsed.data.success) return parsed.data;
+			throw new UnexpectedServerError(parsed.error?.message || parsed.data?.message || 'Invalid response');
+		}
 		case 401: throw new UnauthorizedError();
 		case 404: throw new NotFoundError();
 		default: throw new UnexpectedStatusError(res.status);
@@ -86,7 +101,12 @@ export const generateHealthRecords = async (input: GenerateHealthRecordsInputTyp
 		credentials: 'include',
 	});
 	switch (res.status) {
-		case 200: return parseFakeResult(await res.json());
+		case 200: {
+			const data = await res.json();
+			const parsed = FakeResultSchema.safeParse(data);
+			if (parsed.success && parsed.data.success) return parsed.data;
+			throw new UnexpectedServerError(parsed.error?.message || parsed.data?.message || 'Invalid response');
+		}
 		case 401: throw new UnauthorizedError();
 		case 404: throw new NotFoundError();
 		default: throw new UnexpectedStatusError(res.status);
@@ -100,7 +120,12 @@ export const generateHospitals = async (input: GenerateHospitalsInputType): Prom
 		credentials: 'include',
 	});
 	switch (res.status) {
-		case 200: return parseFakeResult(await res.json());
+		case 200: {
+			const data = await res.json();
+			const parsed = FakeResultSchema.safeParse(data);
+			if (parsed.success && parsed.data.success) return parsed.data;
+			throw new UnexpectedServerError(parsed.error?.message || parsed.data?.message || 'Invalid response');
+		}
 		case 401: throw new UnauthorizedError();
 		case 404: throw new NotFoundError();
 		default: throw new UnexpectedStatusError(res.status);
@@ -114,7 +139,12 @@ export const generatePrescriptions = async (input: GeneratePrescriptionsInputTyp
 		credentials: 'include',
 	});
 	switch (res.status) {
-		case 200: return parseFakeResult(await res.json());
+		case 200: {
+			const data = await res.json();
+			const parsed = FakeResultSchema.safeParse(data);
+			if (parsed.success && parsed.data.success) return parsed.data;
+			throw new UnexpectedServerError(parsed.error?.message || parsed.data?.message || 'Invalid response');
+		}
 		case 401: throw new UnauthorizedError();
 		case 404: throw new NotFoundError();
 		default: throw new UnexpectedStatusError(res.status);
@@ -128,7 +158,12 @@ export const generateProcedures = async (input: GenerateProceduresInputType): Pr
 		credentials: 'include',
 	});
 	switch (res.status) {
-		case 200: return parseFakeResult(await res.json());
+		case 200: {
+			const data = await res.json();
+			const parsed = FakeResultSchema.safeParse(data);
+			if (parsed.success && parsed.data.success) return parsed.data;
+			throw new UnexpectedServerError(parsed.error?.message || parsed.data?.message || 'Invalid response');
+		}
 		case 401: throw new UnauthorizedError();
 		case 404: throw new NotFoundError();
 		default: throw new UnexpectedStatusError(res.status);
@@ -144,7 +179,7 @@ export const getAdminCounts = async (): Promise<AdminCountsType> => {
     const json = await res.json();
     const parsed = AdminCountsSchema.safeParse(json);
     if (parsed.success) return parsed.data;
-    throw new APIParseError();
+    throw new UnexpectedServerError(parsed.error?.message || 'Invalid response');
   } else {
     throw new UnexpectedStatusError(res.status);
   }
@@ -163,19 +198,19 @@ export const AdminAPI = {
 			invalidates: ['generalPractitioner', 'all'],
 		},
 		generateAllergies: {
-			mutationKey: ['admin', 'generateAllergies'],
+			mutationKey: (patientId: number) => ['admin', 'generateAllergies', { patientId: patientId.toString() }],
 			mutationFn: generateAllergies,
-			invalidates: ['patient', 'all'],
+			invalidates: (patientId: number) => ['allergy', { patientId: patientId.toString() }, 'all'],
 		},
 		generateEmergencyContacts: {
-			mutationKey: ['admin', 'generateEmergencyContacts'],
+			mutationKey: (patientId: number) => ['admin', 'generateEmergencyContacts', { patientId: patientId.toString() }],
 			mutationFn: generateEmergencyContacts,
-			invalidates: ['patient', 'all'],
+			invalidates: (patientId: number) => ['emergencyContact', { patientId: patientId.toString() }, 'all'],
 		},
 		generateHealthRecords: {
-			mutationKey: ['admin', 'generateHealthRecords'],
+			mutationKey: (patientId: number) =>  ['admin', 'generateHealthRecords', { patientId: patientId.toString() }],
 			mutationFn: generateHealthRecords,
-			invalidates: ['patient', 'all'],
+			invalidates: (patientId: number) => ['healthRecord', { patientId: patientId.toString() }, 'all'],
 		},
 		generateHospitals: {
 			mutationKey: ['admin', 'generateHospitals'],
@@ -183,9 +218,9 @@ export const AdminAPI = {
 			invalidates: ['hospital', 'all'],
 		},
 		generatePrescriptions: {
-			mutationKey: ['admin', 'generatePrescriptions'],
+			mutationKey: (patientId: number) => ['admin', 'generatePrescriptions', { patientId: patientId.toString() }],
 			mutationFn: generatePrescriptions,
-			invalidates: ['patient', 'all'],
+			invalidates: (patientId: number) => ['prescription', { patientId: patientId.toString() }, 'all'],
 		},
 		generateProcedures: {
 			mutationKey: ['admin', 'generateProcedures'],
