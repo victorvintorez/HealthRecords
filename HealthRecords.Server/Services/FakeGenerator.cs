@@ -302,7 +302,7 @@ public class FakeGenerator(HealthRecordsDbContext db) {
 
     public async Task<FakeResult> CreateFakeHospitalsAsync(int count = 1) {
         var faker = new Faker<CreateHospitalFb>()
-            .RuleFor(x => x.Name, _ => CountryDataSet.UnitedKingdom().Area + " University Hospital")
+            .RuleFor(x => x.Name, f => f.Address.City() + " University Hospital")
             .RuleFor(x => x.Address, f => $"{f.Address.StreetAddress()}, {CountryDataSet.UnitedKingdom().Area}, {f.Address.CountryOfUnitedKingdom()}, {CountryDataSet.UnitedKingdom().PostCode()}")
             .RuleFor(x => x.PhoneNumber, f => $"+44 {f.Phone.PhoneNumber("#### ### ###")}");
 
