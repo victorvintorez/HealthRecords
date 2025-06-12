@@ -95,7 +95,7 @@ export const GeneralPractitionerInput = forwardRef<
 				<Combobox.Target>
 					<InputBase
 						ref={ref}
-						value={value}
+						value={search}
 						defaultValue={
 							defaultValue !== 0
 								? gps.find((gp) => gp.id === defaultValue)?.surgeryName ||

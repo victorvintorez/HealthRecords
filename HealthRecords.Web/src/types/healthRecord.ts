@@ -1,10 +1,11 @@
 import { z } from 'zod';
 import { FileSchema, FileType } from './misc';
+import { IntakeReasonEnum } from './enums';
 
 export const HealthRecordSchema = z.object({
 	id: z.number(),
 	date: z.string(),
-	reason: z.string(),
+	reason: IntakeReasonEnum,
 	complaint: z.string(),
 	notes: z.string().nullable(),
 	diagnosis: z.string().nullable(),
@@ -20,7 +21,7 @@ export type HealthRecordListType = z.infer<typeof HealthRecordListSchema>;
 
 export const CreateHealthRecordSchema = z.object({
 	date: z.string(),
-	reason: z.string(),
+	reason: IntakeReasonEnum,
 	complaint: z.string(),
 	notes: z.string().optional(),
 	diagnosis: z.string().optional(),
@@ -32,7 +33,7 @@ export type CreateHealthRecordType = z.infer<typeof CreateHealthRecordSchema>;
 
 export const UpdateHealthRecordSchema = z.object({
 	date: z.string().optional(),
-	reason: z.string().optional(),
+	reason: IntakeReasonEnum.optional(),
 	complaint: z.string().optional(),
 	notes: z.string().optional(),
 	diagnosis: z.string().optional(),

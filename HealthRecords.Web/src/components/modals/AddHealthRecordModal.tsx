@@ -23,7 +23,7 @@ export const AddHealthRecordModal = (props: ContextModalProps<{ patientId: numbe
     mode: 'uncontrolled',
     initialValues: {
       date: new Date().toISOString().slice(0, 10),
-      reason: '',
+      reason: IntakeReasonEnum.Values.Other,
       complaint: '',
       notes: '',
       diagnosis: '',
@@ -82,10 +82,9 @@ export const AddHealthRecordModal = (props: ContextModalProps<{ patientId: numbe
         />
         <Select
           label="Reason"
-          data={dummyReasons}
+          data={Object.values(IntakeReasonEnum.Values)}
           required
-          value={form.values.reason}
-          onChange={val => form.setFieldValue('reason', val || '')}
+          {...form.getInputProps('reason')}
         />
         <TextInput
           size="md"

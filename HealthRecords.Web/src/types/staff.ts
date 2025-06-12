@@ -13,11 +13,8 @@ export const StaffSchema = z.object({
 });
 export type StaffType = z.infer<typeof StaffSchema>;
 
-export const StaffPageResponseSchema = z.object({
-	staff: z.array(StaffSchema),
-	cursor: z.nullable(z.number()).optional(),
-});
-export type StaffPageResponseType = z.infer<typeof StaffPageResponseSchema>;
+export const StaffListSchema = z.array(StaffSchema);
+export type StaffListType = z.infer<typeof StaffListSchema>;
 
 export const UpdateStaffSchema = z.object({
 	fullName: z.string().optional(),

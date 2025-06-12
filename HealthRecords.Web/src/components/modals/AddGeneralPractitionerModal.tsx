@@ -97,7 +97,7 @@ export const AddGeneralPractitionerModal = (props: ContextModalProps) => {
             variant="outline"
             color="red"
             fullWidth
-            onClick={modals.closeAll}
+            onClick={() => modals.close(props.id)}
           >
             Cancel!
           </Button>

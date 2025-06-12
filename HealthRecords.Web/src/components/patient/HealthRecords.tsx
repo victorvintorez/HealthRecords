@@ -8,14 +8,15 @@ import { AuthAPI } from '@/api/auth';
 import { AdminAPI } from '@/api/admin';
 import { notifications } from '@mantine/notifications';
 import { HealthRecordAPI } from '@/api/healthRecord';
-import type { HealthRecordListType } from '@/types/healthRecord';
+import HospitalDetailsCard from '../primitives/HospitalDetailsCard';
+import HealthRecordCard from './HealthRecordCard';
 
 interface HealthRecordsProps {
   patientId: number;
 }
 
 const HealthRecords: React.FC<HealthRecordsProps> = ({ patientId }) => {
-  const { data: records = [], isLoading, isError } = useQuery<HealthRecordListType>({
+  const { data: records = [], isLoading, isError } = useQuery({
     queryKey: HealthRecordAPI.query.healthRecords.queryKey(patientId),
     queryFn: () => HealthRecordAPI.query.healthRecords.queryFn(patientId),
     staleTime: HealthRecordAPI.query.healthRecords.staleTime,
@@ -82,14 +83,7 @@ const HealthRecords: React.FC<HealthRecordsProps> = ({ patientId }) => {
         {isLoading ? (
           <Skeleton animate height={120} width="100%" radius="md" />
         ) : records.map((record) => (
-          <Card key={record.id} withBorder radius="md" shadow="sm" p="md" w="100%" h={120}>
-            <Stack gap="sm">
-              <Text fw={700} size="md">{record.reason}</Text>
-              <Text size="sm">Date: {new Date(record.date).toLocaleDateString()}</Text>
-              <Text size="sm">Diagnosis: {record.diagnosis || 'N/A'}</Text>
-              <Text size="sm">Notes: {record.notes || 'N/A'}</Text>
-            </Stack>
-          </Card>
+          <HealthRecordCard key={record.id} record={record} />
         ))}
         <Card withBorder radius="md" shadow="sm" w="100%" h={120} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <UnstyledButton w="100%" h="100%" onClick={openAddHealthRecordModal}>

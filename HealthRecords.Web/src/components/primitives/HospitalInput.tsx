@@ -50,7 +50,7 @@ export const HospitalInput = forwardRef<HTMLInputElement, HospitalInputProps>(
 
 		useEffect(() => {
 			setSearch(selectedHospital?.name || "");
-			if (selectedHospital?.id) {
+			if (selectedHospital?.id && onChange) {
 				onChange(selectedHospital?.id);
 			}
 		}, [selectedHospital, onChange]);
@@ -87,7 +87,7 @@ export const HospitalInput = forwardRef<HTMLInputElement, HospitalInputProps>(
 					<Combobox.Target>
 						<InputBase
 							ref={ref}
-							value={value}
+							value={search}
 							defaultValue={
 								defaultValue !== 0
 									? hospitals.find((hospital) => hospital.id === defaultValue)

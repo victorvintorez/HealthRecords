@@ -139,7 +139,7 @@ export const AddPatientModal = (props: ContextModalProps) => {
             variant="outline"
             color="red"
             fullWidth
-            onClick={() => modals.close('add-patient-modal')}
+            onClick={() => modals.close(props.id)}
           >
             Cancel!
           </Button>

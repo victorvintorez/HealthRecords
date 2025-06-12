@@ -5,8 +5,8 @@ import {
 	APIParseError,
 } from '../errors.ts';
 import {
-	StaffPageResponseSchema,
-	StaffPageResponseType,
+	StaffListSchema,
+	StaffListType,
 	StaffSchema,
 	StaffType,
 	UpdateStaffType,
@@ -39,7 +39,7 @@ const getStaffSelf = async (): Promise<StaffType> => {
 	}
 };
 
-const getStaffAll = async (): Promise<StaffPageResponseType> => {
+const getStaffAll = async (): Promise<StaffListType> => {
 	const res = await fetch(`/api/v1/staff/all`, {
 		method: 'GET',
 		headers: {
@@ -50,7 +50,7 @@ const getStaffAll = async (): Promise<StaffPageResponseType> => {
 
 	switch (res.status) {
 		case 200: {
-			const response = StaffPageResponseSchema.safeParse(await res.json());
+			const response = StaffListSchema.safeParse(await res.json());
 			if (response.success) {
 				return response.data;
 			} else {

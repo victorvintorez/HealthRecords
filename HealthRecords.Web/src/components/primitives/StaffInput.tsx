@@ -1,4 +1,4 @@
-import type { StaffType } from "@/types/staff";
+import type { StaffListType, StaffType } from "@/types/staff";
 import { StaffAPI } from "@/api/staff";
 import {
   Button,
@@ -20,11 +20,10 @@ interface StaffInputProps {
   defaultValue?: number;
   label?: string;
   onChange: (value: number) => void;
-  withAddStaff?: boolean;
 }
 
 export const StaffInput = forwardRef<HTMLInputElement, StaffInputProps>(
-  ({ value, defaultValue, onChange, withAddStaff = false, label = "Staff" }, ref) => {
+  ({ value, defaultValue, onChange, label = "Staff" }, ref) => {
     const [selectedStaff, setSelectedStaff] = useState<StaffType | null>(null);
     const [search, setSearch] = useState("");
     const combobox = useCombobox({
@@ -33,13 +32,13 @@ export const StaffInput = forwardRef<HTMLInputElement, StaffInputProps>(
       },
     });
 
-    const { data: staffList = { staff: [] }, isLoading } = useQuery({
+    const { data: staff = [], isLoading } = useQuery<StaffListType>({
       queryKey: StaffAPI.query.staffAll.queryKey,
       queryFn: StaffAPI.query.staffAll.queryFn,
       staleTime: StaffAPI.query.staffAll.staleTime,
     });
 
-    const filteredStaff = staffList.staff.filter((staff) =>
+    const filteredStaff = staff.filter((staff) =>
       staff.fullName.toLowerCase().includes(search.toLowerCase())
     );
 
@@ -54,7 +53,7 @@ export const StaffInput = forwardRef<HTMLInputElement, StaffInputProps>(
 
     useEffect(() => {
       setSearch(selectedStaff?.fullName || "");
-      if (selectedStaff?.id) {
+      if (selectedStaff?.id && onChange) {
         onChange(selectedStaff.id);
       }
     }, [selectedStaff, onChange]);
@@ -86,7 +85,7 @@ export const StaffInput = forwardRef<HTMLInputElement, StaffInputProps>(
           store={combobox}
           onOptionSubmit={(val) => {
             setSelectedStaff(
-              staffList.staff.find((staff) => staff.id.toString() === val) ?? null
+              staff.find((staff) => staff.id.toString() === val) ?? null
             );
             combobox.closeDropdown();
           }}
@@ -97,7 +96,7 @@ export const StaffInput = forwardRef<HTMLInputElement, StaffInputProps>(
               value={search}
               defaultValue={
                 defaultValue !== 0
-                  ? staffList.staff.find((staff) => staff.id === defaultValue)?.fullName || undefined
+                  ? staff.find((staff) => staff.id === defaultValue)?.fullName || undefined
                   : undefined
               }
               onChange={(event) => {
@@ -108,7 +107,7 @@ export const StaffInput = forwardRef<HTMLInputElement, StaffInputProps>(
               onFocus={() => combobox.openDropdown()}
               rightSection={<Combobox.Chevron />}
               rightSectionPointerEvents="none"
-              mb={withAddStaff ? "xs" : undefined}
+              mb="xs"
             />
           </Combobox.Target>
 
@@ -126,22 +125,6 @@ export const StaffInput = forwardRef<HTMLInputElement, StaffInputProps>(
             </Combobox.Options>
           </Combobox.Dropdown>
         </Combobox>
-        {withAddStaff && (
-          <Button
-            fullWidth
-            color="gray"
-            onClick={() =>
-              openContextModal({
-                modal: "add-staff-modal",
-                innerProps: {
-                  withCloseButton: false,
-                },
-              })
-            }
-          >
-            Create New Staff
-          </Button>
-        )}
       </Stack>
     );
   }
